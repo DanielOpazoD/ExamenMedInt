@@ -14,7 +14,7 @@ const ICONS = {
     nefro: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.75 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /><path fill-rule="evenodd" d="M8.25 3.75a3.75 3.75 0 00-3.75 3.75v.518c0 .193.023.382.068.568L6 11.25v2.25a.75.75 0 00.75.75h1.5a.75.75 0 00.75-.75V11.25l1.432-2.712a.75.75 0 011.088-.286l1.838.919a.75.75 0 00.916-.251l1.691-2.254a.75.75 0 011.214-.043l1.83 2.745a.75.75 0 001.214-.043l.83-1.246a3.75 3.75 0 00-1.214-5.262V3.75a3.75 3.75 0 00-3.75-3.75h-9zM7.5 7.5a2.25 2.25 0 012.25-2.25h9a2.25 2.25 0 012.25 2.25v.135a.75.75 0 00-.01-.02l-.83 1.245a.75.75 0 01-1.214.043l-1.83-2.745a.75.75 0 00-1.214.043L13.69 8.46a.75.75 0 01-.916.251l-1.838-.919a.75.75 0 00-1.088.286L8.432 10.8a.75.75 0 01-.068.14L7.5 9.135V7.5z" clip-rule="evenodd" /></svg>`,
     digestivo: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071 1.052A32.095 32.095 0 0113.31 18.27l-5.657-5.657a.75.75 0 00-1.061 1.061l5.657 5.657a32.11 32.11 0 01-4.76.626.75.75 0 00-.75.75v.002a.75.75 0 00.75.75l.17.005a33.6 33.6 0 005.152-.682.75.75 0 00.672-1.033 32.09 32.09 0 00-1.08-11.873.75.75 0 00-1.053-1.07Z" clip-rule="evenodd" /></svg>`,
     metabolismo: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a.75.75 0 01.75.75V6h4.5a.75.75 0 010 1.5H6.75a.75.75 0 010-1.5H11.25V2.25a.75.75 0 01.75-.75zM6.06 9.524a.75.75 0 01.442.88l-1.5 4.5a.75.75 0 11-1.408-.468l1.5-4.5a.75.75 0 01.966-.412zm11.88 0a.75.75 0 01.966.412l1.5 4.5a.75.75 0 11-1.408.468l-1.5-4.5a.75.75 0 01.442-.88zM12 18a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V18.75a.75.75 0 01.75-.75z" /><path fill-rule="evenodd" d="M15.28 7.5H8.72a.75.75 0 000 1.5h6.56a.75.75 0 000-1.5zM4.686 16.5a.75.75 0 01.53-.22h13.568a.75.75 0 01.53.22l1.323 1.323a.75.75 0 010 1.06l-1.323 1.323a.75.75 0 01-.53.22H5.216a.75.75 0 01-.53-.22L3.363 18.884a.75.75 0 010-1.06l1.323-1.323z" clip-rule="evenodd" /></svg>`,
-    hemato: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm15 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" /><path d="M12 2.25c-5.523 0-10 3.023-10 6.75s4.477 6.75 10 6.75 10-3.023 10-6.75S17.523 2.25 12 2.25zM4.067 9.172a8.513 8.513 0 015.197-2.618 1.5 1.5 0 10-.728-2.887 11.513 11.513 0 00-6.98 3.593.75.75 0 00.255 1.05A.75.75 0 004.067 9.172zM12 14.25a7.5 7.5 0 01-7.443-7.009A.75.75 0 003.75 6.75a.75.75 0 00-.525.223A8.995 8.995 0 002.25 9c0 3.866 4.03 7 9 7s9-3.134 9-7c0-.28-.013-.559-.038-.83a.75.75 0 00-.472-.663A.75.75 0 0019.5 7.5a.75.75 0 00-.568.243A7.5 7.5 0 0112 14.25z" /></svg>`,
+    hemato: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM15 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" /><path d="M12 2.25c-5.523 0-10 3.023-10 6.75s4.477 6.75 10 6.75 10-3.023 10-6.75S17.523 2.25 12 2.25zM4.067 9.172a8.513 8.513 0 015.197-2.618 1.5 1.5 0 10-.728-2.887 11.513 11.513 0 00-6.98 3.593.75.75 0 00.255 1.05A.75.75 0 004.067 9.172zM12 14.25a7.5 7.5 0 01-7.443-7.009A.75.75 0 003.75 6.75a.75.75 0 00-.525.223A8.995 8.995 0 002.25 9c0 3.866 4.03 7 9 7s9-3.134 9-7c0-.28-.013-.559-.038-.83a.75.75 0 00-.472-.663A.75.75 0 0019.5 7.5a.75.75 0 00-.568.243A7.5 7.5 0 0112 14.25z" /></svg>`,
     neuro: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 9.75a4.5 4.5 0 11-8.528-2.227.75.75 0 00-1.428.473A6 6 0 1017.25 9.75a.75.75 0 00-1.5 0z" /><path d="M12 3.75a.75.75 0 00-.75.75V11.25a.75.75 0 001.5 0V4.5a.75.75 0 00-.75-.75z" /><path d="M12.75 12.75a.75.75 0 00-1.5 0v5.69l-1.846-1.615a.75.75 0 00-1.016 1.102l3.25 2.844a.75.75 0 001.016 0l3.25-2.844a.75.75 0 10-1.016-1.102L12.75 18.44v-5.69z" /></svg>`,
     reumato: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`,
     infecto: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.533A9.75 9.75 0 001.5 12c0 5.385 4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75c0-4.88-3.548-8.95-8.25-9.667v1.613a1.5 1.5 0 01-1.5 1.5H9a1.5 1.5 0 01-1.5-1.5V5.25a.75.75 0 00-.75-.75h-.75a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-1.5h.75a.75.75 0 00.75-.75V6h1.5a.75.75 0 00.75-.75V4.533zM9 10.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm7.5 1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>`,
@@ -467,6 +467,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Editor Logic ---
     function setupEditorToolbar() {
+        // Fix for command re-application issue by forcing the browser to use CSS.
+        document.execCommand('styleWithCSS', false, true);
+
         const textColorPaletteHTML = `
             <div class="color-palette" title="Color de Texto">
                 <button data-command="foreColor" data-color="#EF4444" class="color-swatch" style="background-color: #EF4444;"></button>
@@ -504,9 +507,10 @@ document.addEventListener('DOMContentLoaded', function () {
         editorToolbar.innerHTML = `
             <div class="relative">
                 <select id="font-size-selector" class="appearance-none w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-sm rounded-md py-1.5 pl-2 pr-8 focus:outline-none focus:ring-2 focus:ring-sky-400" title="Tamaño de Fuente">
+                    <option value="" disabled selected>Tamaño</option>
                     <option value="1">Muy Pequeño</option>
                     <option value="2">Pequeño</option>
-                    <option value="3" selected>Normal</option>
+                    <option value="3">Normal</option>
                     <option value="5">Grande</option>
                     <option value="7">Muy Grande</option>
                 </select>
@@ -574,8 +578,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         editorToolbar.querySelector('#font-size-selector').addEventListener('change', (e) => {
             const size = e.target.value;
-            notesEditor.focus();
-            document.execCommand('fontSize', false, size);
+            if (size) { // Make sure not to run on the placeholder
+                notesEditor.focus();
+                document.execCommand('fontSize', false, size);
+                e.target.value = ''; // Reset to placeholder
+            }
         });
 
         editorToolbar.addEventListener('click', (e) => {

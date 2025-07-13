@@ -322,74 +322,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Event Listeners ---
     tableBody.addEventListener('click', function (e) {
         const target = e.target;
-        
-        // If the click is on an interactive element inside a cell, stop processing.
-        if (target.closest('a') || target.closest('.note-icon') || target.closest('.edit-link-icon') || target.closest('.delete-section-links-btn')) {
-             // Let other handlers or default behavior take over.
-        } else {
-            // Handle cell state change for fillable cells
-            const fillableCell = target.closest('.fillable-cell');
-            if (fillableCell) {
-                const currentStatus = fillableCell.dataset.status || 'default';
-                let nextStatus = 'default';
-
-                if (currentStatus === 'default') {
-                    nextStatus = 'filled'; // default -> green
-                } else if (currentStatus === 'filled') {
-                    nextStatus = 'not-done'; // green -> red
-                } else if (currentStatus === 'not-done') {
-                    nextStatus = 'default'; // red -> default
-                }
-                
-                fillableCell.dataset.status = nextStatus;
-                fillableCell.classList.remove('filled', 'not-done');
-                if (nextStatus !== 'default') {
-                    fillableCell.classList.add(nextStatus);
-                }
-                updateAllTotals();
-                saveState();
-                return; // Stop further processing
-            }
-
-            // Handle counter for lectura cells
-            const lecturaCell = target.closest('.lectura-cell');
-            if (lecturaCell) {
-                 if (target.closest('.note-icon')) return; // Ignore clicks on note icons
-            
-                const counterSpan = lecturaCell.querySelector('.lectura-counter');
-                if (counterSpan) {
-                    let count = parseInt(counterSpan.textContent, 10);
-                    count = (count + 1) % 6; // Cycle 0-5
-                    counterSpan.textContent = String(count);
-                    lecturaCell.classList.toggle('lectura-filled', count > 0);
-                    updateAllTotals();
-                    saveState();
-                }
-                return; // Stop further processing
-            }
-        }
-
-        // --- Handle other specific clicks that were not handled above ---
-
-        const sectionHeader = target.closest('.section-header-row');
-        if (sectionHeader && !target.closest('.note-icon') && !target.closest('.section-icon-container') && !target.closest('.delete-section-links-btn')) {
-            const sectionName = sectionHeader.dataset.sectionHeader;
-            toggleSection(sectionName);
-            saveState();
-            return;
-        }
-
-        const confidenceDot = target.closest('.confidence-dot');
-        if (confidenceDot) {
-            e.stopPropagation();
-            let level = parseInt(confidenceDot.dataset.confidenceLevel || '0', 10);
-            level = (level + 1) % 4; // Cycles 0 -> 1 -> 2 -> 3 -> 0
-            confidenceDot.dataset.confidenceLevel = String(level);
-            applyFiltersAndSearch();
-            saveState();
-            return;
-        }
-
+    
+        // --- Handle clicks on specific interactive elements first ---
+    
         const noteIcon = target.closest('.note-icon');
         if (noteIcon) {
             e.stopPropagation();
@@ -397,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let topicTitle = '';
             let defaultTooltip = '';
             const noteData = activeNoteIcon.dataset.note || '';
-
+    
             if (activeNoteIcon.classList.contains('section-note-icon')) {
                 const sectionHeaderEl = activeNoteIcon.closest('.section-header-row');
                 topicTitle = `Notas para: ${sectionHeaderEl?.querySelector('.section-title')?.textContent || 'Sección'}`;
@@ -417,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function () {
             notesEditor.focus();
             return;
         }
-
+    
         const editLinkIcon = target.closest('.edit-link-icon');
         if (editLinkIcon) {
             e.stopPropagation();
@@ -432,13 +367,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             return;
         }
-
+    
         const deleteLinksBtn = target.closest('.delete-section-links-btn');
         if (deleteLinksBtn) {
             e.stopPropagation();
             const headerRow = deleteLinksBtn.closest('.section-header-row');
             if (!headerRow) return;
-
+    
             const sectionName = headerRow.dataset.sectionHeader;
             if (confirm(`¿Estás seguro de que quieres eliminar todos los hipervínculos de esta sección? Esta acción no se puede deshacer.`)) {
                 const sectionRows = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
@@ -451,6 +386,75 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     });
                 });
+                saveState();
+            }
+            return;
+        }
+    
+        const iconContainer = target.closest('.section-icon-container');
+        if (iconContainer) {
+            e.stopPropagation();
+            activeSectionIconContainer = iconContainer;
+            openModal(iconPickerModal);
+            return;
+        }
+    
+        const confidenceDot = target.closest('.confidence-dot');
+        if (confidenceDot) {
+            e.stopPropagation();
+            let level = parseInt(confidenceDot.dataset.confidenceLevel || '0', 10);
+            level = (level + 1) % 4; // Cycles 0 -> 1 -> 2 -> 3 -> 0
+            confidenceDot.dataset.confidenceLevel = String(level);
+            applyFiltersAndSearch();
+            saveState();
+            return;
+        }
+    
+        const sectionHeader = target.closest('.section-header-row');
+        if (sectionHeader) {
+            // Only toggle section if the click is not on one of the interactive icons inside it
+            if (!target.closest('.note-icon, .section-icon-container, .delete-section-links-btn')) {
+                const sectionName = sectionHeader.dataset.sectionHeader;
+                toggleSection(sectionName);
+                saveState();
+            }
+            return;
+        }
+        
+        // --- Handle clicks on the cell bodies ---
+    
+        const fillableCell = target.closest('.fillable-cell');
+        if (fillableCell) {
+            const currentStatus = fillableCell.dataset.status || 'default';
+            let nextStatus = 'default';
+    
+            if (currentStatus === 'default') {
+                nextStatus = 'filled';
+            } else if (currentStatus === 'filled') {
+                nextStatus = 'not-done';
+            } else if (currentStatus === 'not-done') {
+                nextStatus = 'default';
+            }
+            
+            fillableCell.dataset.status = nextStatus;
+            fillableCell.classList.remove('filled', 'not-done');
+            if (nextStatus !== 'default') {
+                fillableCell.classList.add(nextStatus);
+            }
+            updateAllTotals();
+            saveState();
+            return;
+        }
+    
+        const lecturaCell = target.closest('.lectura-cell');
+        if (lecturaCell) {
+            const counterSpan = lecturaCell.querySelector('.lectura-counter');
+            if (counterSpan) {
+                let count = parseInt(counterSpan.textContent, 10);
+                count = (count + 1) % 6; // Cycle 0-5
+                counterSpan.textContent = String(count);
+                lecturaCell.classList.toggle('lectura-filled', count > 0);
+                updateAllTotals();
                 saveState();
             }
             return;
@@ -520,6 +524,16 @@ document.addEventListener('DOMContentLoaded', function () {
             <button data-command="indent" title="Aumentar Sangría" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 8.25L19.5 12m0 0l-3.75 3.75M19.5 12H3.75" /></svg></button>
             <button data-command="outdent" title="Disminuir Sangría" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25L4.5 12m0 0l3.75 3.75M4.5 12h15" /></svg></button>
             <button data-command="insertUnorderedList" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Viñetas"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 15.25z" clip-rule="evenodd" /></svg></button>
+            <div class="relative">
+                <button id="symbol-palette-btn" title="Insertar Símbolo" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9.25a.75.75 0 000 1.5h6a.75.75 0 000-1.5H7zM6.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12zm7.5 0a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <div id="symbol-palette" class="hidden absolute top-full mt-2 left-0 z-20 w-max bg-secondary border border-border-color rounded-lg shadow-xl p-2 grid grid-cols-10 gap-1">
+                    <!-- populated by JS -->
+                </div>
+            </div>
             <div class="h-5 border-l border-gray-300 dark:border-gray-600 mx-1"></div>
             <button data-command="insertImage" title="Insertar Imagen desde URL" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M1 5.25A2.25 2.25 0 013.25 3h13.5A2.25 2.25 0 0119 5.25v9.5A2.25 2.25 0 0116.75 17H3.25A2.25 2.25 0 011 14.75v-9.5zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75v-2.69l-2.22-2.219a.75.75 0 00-1.06 0l-1.91 1.909a.75.75 0 01-1.06 0l-2.22-2.22a.75.75 0 00-1.06 0l-2.22 2.22a.75.75 0 01-1.06 0l-1.53-1.531a.75.75 0 00-1.06 0zM5 7a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg></button>
             <button id="increase-image-btn" title="Aumentar Tamaño de Imagen" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg></button>
@@ -528,6 +542,29 @@ document.addEventListener('DOMContentLoaded', function () {
             <button id="improve-text-btn" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Mejorar texto con IA">✨</button>
             <button id="print-note-btn" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Imprimir/PDF"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6 18.25m0 0a2.25 2.25 0 002.25 2.25h5.5A2.25 2.25 0 0016 18.25m-1.75-4.421l-1.44-1.44a1.5 1.5 0 00-2.12 0l-1.44 1.44m11.316 0a48.426 48.426 0 01-11.316 0m11.316 0V7.5A2.25 2.25 0 0018 5.25h-5.5a2.25 2.25 0 00-2.25 2.25v.632m1.38-2.886A2.252 2.252 0 0110.5 3h3a2.252 2.252 0 012.12 1.5Z" /></svg></button>
             `;
+        
+        // --- Populate and handle symbol palette ---
+        const symbolPalette = editorToolbar.querySelector('#symbol-palette');
+        const symbolPaletteBtn = editorToolbar.querySelector('#symbol-palette-btn');
+        if (symbolPalette && symbolPaletteBtn) {
+            const symbols = ['💡','⚠️','🔹','🔸','📝','📌','📍','📎','➔','➖','・','☑️','☐','✅','💊','💉','🩸','⚡','🦠','🧬'];
+            symbolPalette.innerHTML = symbols.map(s => `<button type="button" class="p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-lg flex items-center justify-center">${s}</button>`).join('');
+            
+            symbolPaletteBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                symbolPalette.classList.toggle('hidden');
+            });
+    
+            symbolPalette.addEventListener('click', e => {
+                const button = e.target.closest('button');
+                if (button) {
+                    const symbol = button.textContent;
+                    notesEditor.focus();
+                    document.execCommand('insertText', false, symbol);
+                    symbolPalette.classList.add('hidden');
+                }
+            });
+        }
         
         editorToolbar.addEventListener('mousedown', e => {
             if (e.target.tagName !== 'SELECT' && e.target.parentElement.tagName !== 'SELECT') {
@@ -878,9 +915,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const noteIcon = headerRow.querySelector('.section-note-icon');
                 loadNote(noteIcon, noteData, 'Notas de sección');
             }
-            if (state.collapsedSections?.includes(sectionName)) {
-                toggleSection(sectionName, true); // force collapse without saving
-            }
+            
             const iconName = state.sectionIcons?.[sectionName];
             if (iconName && ICONS[iconName]) {
                  const iconContainer = headerRow.querySelector('.section-icon-container');
@@ -912,9 +947,17 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Search and Filter ---
     function applyFiltersAndSearch() {
         const searchTerm = searchBar.value.toLowerCase().trim();
-        let visibleCount = 0;
 
         document.querySelectorAll('tr[data-section]').forEach(row => {
+            const sectionName = row.dataset.section;
+            const headerRow = sections[sectionName]?.headerRow;
+
+            // If section is collapsed, row should be hidden
+            if (headerRow && headerRow.classList.contains('collapsed')) {
+                row.style.display = 'none';
+                return; // Go to next row
+            }
+            
             const topicText = row.querySelector('.topic-text').textContent.toLowerCase();
             const confidenceDot = row.querySelector('.confidence-dot');
             const confidenceLevel = confidenceDot ? confidenceDot.dataset.confidenceLevel : '0';
@@ -924,7 +967,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (searchMatch && filterMatch) {
                 row.style.display = '';
-                visibleCount++;
             } else {
                 row.style.display = 'none';
             }
@@ -996,7 +1038,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const ai = new GoogleGenAI({ apiKey: API_KEY });
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-preview-04-17',
+            model: 'gemini-2.5-flash',
             contents: prompt,
         });
         return response.text;
@@ -1082,22 +1124,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Section Collapse/Expand ---
     function toggleSection(sectionName, forceCollapse = false) {
-        const sectionRows = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
-        const headerRow = sections[sectionName].headerRow;
-        const totalRow = sections[sectionName].totalRow;
+        const headerRow = sections[sectionName]?.headerRow;
+        const totalRow = sections[sectionName]?.totalRow;
+
+        if (!headerRow || !totalRow) return;
 
         const isCollapsed = headerRow.classList.contains('collapsed');
 
         if (forceCollapse || !isCollapsed) {
              headerRow.classList.add('collapsed');
-             sectionRows.forEach(r => r.style.display = 'none');
              totalRow.style.display = 'none';
         } else {
              headerRow.classList.remove('collapsed');
-             // We use applyFiltersAndSearch to restore rows, respecting current search/filter
-             applyFiltersAndSearch();
              totalRow.style.display = '';
         }
+        
+        // After changing the state of the section, re-apply filters to update topic row visibility.
+        applyFiltersAndSearch();
     }
     
     // --- Utility Functions ---
@@ -1135,6 +1178,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
             settingsDropdown.classList.add('hidden');
         }
+        const symbolPaletteContainer = document.querySelector('#symbol-palette-btn')?.parentElement;
+        if (symbolPaletteContainer && !symbolPaletteContainer.contains(e.target)) {
+            const palette = symbolPaletteContainer.querySelector('#symbol-palette');
+            if (palette) palette.classList.add('hidden');
+        }
     });
 
     settingsDropdown.addEventListener('click', (e) => {
@@ -1166,15 +1214,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    tableBody.addEventListener('click', (e) => {
-        const iconContainer = e.target.closest('.section-icon-container');
-        if (iconContainer) {
-            e.stopPropagation();
-            activeSectionIconContainer = iconContainer;
-            openModal(iconPickerModal);
-        }
-    });
-
     iconPickerGrid.addEventListener('click', (e) => {
         const iconItem = e.target.closest('.icon-picker-item');
         if (iconItem && activeSectionIconContainer) {
@@ -1201,11 +1240,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         setupEditorToolbar();
         loadState();
-        if (!API_KEY) {
+        if (!API_KEY || API_KEY === '') {
             askAiBtn.disabled = true;
             askAiBtn.title = 'Se necesita una clave API para usar las funciones de IA';
             askAiBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            getElem('improve-text-btn').style.display = 'none';
+            const improveBtn = getElem('improve-text-btn');
+            if (improveBtn) improveBtn.style.display = 'none';
         }
     }
     

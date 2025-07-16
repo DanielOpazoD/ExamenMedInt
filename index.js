@@ -1,12 +1,10 @@
 
-
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import { GoogleGenAI } from "@google/genai";
-
-const API_KEY = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
+// La importación de GoogleGenAI y la constante API_KEY se han eliminado
+// ya que las llamadas a la API ahora son manejadas por una función sin servidor (backend).
 
 document.addEventListener('DOMContentLoaded', function () {
     // --- DOM Element Cache ---
@@ -1179,23 +1177,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         cancelAiQaBtn.addEventListener('click', () => hideModal(aiQaModal));
+        
         sendAiQaBtn.addEventListener('click', async () => {
             const question = aiQuestionInput.value.trim();
             if (!question) {
                 alert("Por favor, escribe una pregunta.");
                 return;
             }
-            if (!API_KEY) {
-                alert("La clave de API de Google GenAI no está configurada.");
-                return;
-            }
 
             aiQaLoader.classList.remove('hidden');
             sendAiQaBtn.disabled = true;
+            aiResponseArea.textContent = 'Contactando a la IA...';
 
             try {
-                const ai = new GoogleGenAI({ apiKey: API_KEY });
-                
+                // El contexto se construye en el cliente y se envía a la función
                 let context = "Contexto de las notas del usuario:\n\n";
                 document.querySelectorAll('tr[data-topic-id]').forEach(row => {
                     const title = row.querySelector('.topic-text').textContent;
@@ -1208,24 +1203,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
 
-                const fullPrompt = `${context}\n\n---\n\nPregunta del usuario: ${question}\n\nResponde a la pregunta basándote únicamente en el contexto proporcionado. Si la respuesta no está en el contexto, indícalo claramente.`;
-                
-                const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash',
-                    contents: fullPrompt
+                const response = await fetch('/.netlify/functions/ask-ai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question, context })
                 });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || `Error del servidor: ${response.status}`);
+                }
                 
-                let responseText = response.text.replace(/\n/g, '<br>'); // Simple markdown to HTML
+                let responseText = data.text.replace(/\n/g, '<br>');
                 aiResponseArea.innerHTML = responseText;
 
             } catch (error) {
-                console.error("Error con la API de GenAI:", error);
-                aiResponseArea.textContent = "Hubo un error al contactar a la IA. Por favor, revisa la consola para más detalles.";
+                console.error("Error llamando a la función de IA:", error);
+                aiResponseArea.textContent = `Hubo un error al contactar a la IA: ${error.message}`;
             } finally {
                 aiQaLoader.classList.add('hidden');
                 sendAiQaBtn.disabled = false;
             }
         });
+
 
         // Global listener for closing popups on outside click
         window.addEventListener('click', e => {

@@ -1,10 +1,9 @@
 
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-// La importación de GoogleGenAI y la constante API_KEY se han eliminado
-// ya que las llamadas a la API ahora son manejadas por una función sin servidor (backend).
 
 document.addEventListener('DOMContentLoaded', function () {
     // --- DOM Element Cache ---
@@ -1187,42 +1186,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
             aiQaLoader.classList.remove('hidden');
             sendAiQaBtn.disabled = true;
-            aiResponseArea.textContent = 'Contactando a la IA...';
+            aiResponseArea.innerHTML = 'Pensando...'; // Provide feedback
 
             try {
-                // El contexto se construye en el cliente y se envía a la función
                 let context = "Contexto de las notas del usuario:\n\n";
                 document.querySelectorAll('tr[data-topic-id]').forEach(row => {
-                    const title = row.querySelector('.topic-text').textContent;
+                    const title = row.querySelector('.topic-text')?.textContent || 'Sin Título';
                     const greyNote = row.dataset.greyNote;
                     const blueNote = row.dataset.blueNote;
-                    if(greyNote || blueNote) {
+                    if (greyNote || blueNote) {
                         context += `--- TEMA: ${title} ---\n`;
-                        if (greyNote) context += `Esquema:\n${new DOMParser().parseFromString(greyNote, 'text/html').body.textContent}\n\n`;
-                        if (blueNote) context += `Desarrollo:\n${new DOMParser().parseFromString(blueNote, 'text/html').body.textContent}\n\n`;
+                        if (greyNote) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = greyNote;
+                            context += `Esquema:\n${tempDiv.textContent || tempDiv.innerText || ''}\n\n`;
+                        }
+                        if (blueNote) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = blueNote;
+                            context += `Desarrollo:\n${tempDiv.textContent || tempDiv.innerText || ''}\n\n`;
+                        }
                     }
                 });
-
+                
+                // Using a relative path for the Netlify function
                 const response = await fetch('/.netlify/functions/ask-ai', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ question, context })
+                    body: JSON.stringify({ question, context }),
                 });
 
-                const data = await response.json();
-
                 if (!response.ok) {
-                    throw new Error(data.error || `Error del servidor: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({ error: `El servidor respondió con un error ${response.status}, pero el cuerpo de la respuesta no pudo ser leído.` }));
+                    throw new Error(`Error del servidor: ${response.status}. ${errorData.error || ''}`);
                 }
                 
-                let responseText = data.text.replace(/\n/g, '<br>');
+                const data = await response.json();
+                let responseText = data.response.replace(/\n/g, '<br>'); // Simple markdown to HTML
                 aiResponseArea.innerHTML = responseText;
 
             } catch (error) {
                 console.error("Error llamando a la función de IA:", error);
-                aiResponseArea.textContent = `Hubo un error al contactar a la IA: ${error.message}`;
+                aiResponseArea.innerHTML = `Hubo un error al contactar a la IA: ${error.message}`;
             } finally {
                 aiQaLoader.classList.add('hidden');
                 sendAiQaBtn.disabled = false;

@@ -1,3 +1,5 @@
+
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -5,20 +7,6 @@
 import { GoogleGenAI } from "@google/genai";
 
 const API_KEY = (typeof process !== 'undefined' && process.env) ? process.env.API_KEY : '';
-
-// --- Icon Definitions ---
-const ICONS = {
-    default: `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" /></svg>`,
-    cardio: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12.707 3.636a1 1 0 00-1.414 0L4.222 10.707a8.5 8.5 0 1011.071 11.071l7.07-7.071a1 1 0 000-1.414l-7.07-7.071zM12 20.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13z" clip-rule="evenodd" /></svg>`,
-    neumo: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 18.75a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" /><path fill-rule="evenodd" d="M8.625.75A3.375 3.375 0 005.25 4.125v15.75a3.375 3.375 0 003.375 3.375h6.75a3.375 3.375 0 003.375-3.375V4.125A3.375 3.375 0 0015.375.75h-6.75zM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75c-.621 0-1.125-.504-1.125-1.125V4.125z" clip-rule="evenodd" /></svg>`,
-    nefro: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.75 12.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" /><path fill-rule="evenodd" d="M8.25 3.75a3.75 3.75 0 00-3.75 3.75v.518c0 .193.023.382.068.568L6 11.25v2.25a.75.75 0 00.75.75h1.5a.75.75 0 00.75-.75V11.25l1.432-2.712a.75.75 0 011.088-.286l1.838.919a.75.75 0 00.916-.251l1.691-2.254a.75.75 0 011.214-.043l1.83 2.745a.75.75 0 001.214-.043l.83-1.246a3.75 3.75 0 00-1.214-5.262V3.75a3.75 3.75 0 00-3.75-3.75h-9zM7.5 7.5a2.25 2.25 0 012.25-2.25h9a2.25 2.25 0 012.25 2.25v.135a.75.75 0 00-.01-.02l-.83 1.245a.75.75 0 01-1.214.043l-1.83-2.745a.75.75 0 00-1.214.043L13.69 8.46a.75.75 0 01-.916.251l-1.838-.919a.75.75 0 00-1.088.286L8.432 10.8a.75.75 0 01-.068.14L7.5 9.135V7.5z" clip-rule="evenodd" /></svg>`,
-    digestivo: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12.963 2.286a.75.75 0 00-1.071 1.052A32.095 32.095 0 0113.31 18.27l-5.657-5.657a.75.75 0 00-1.061 1.061l5.657 5.657a32.11 32.11 0 01-4.76.626.75.75 0 00-.75.75v.002a.75.75 0 00.75.75l.17.005a33.6 33.6 0 005.152-.682.75.75 0 00.672-1.033 32.09 32.09 0 00-1.08-11.873.75.75 0 00-1.053-1.07Z" clip-rule="evenodd" /></svg>`,
-    metabolismo: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5a.75.75 0 01.75.75V6h4.5a.75.75 0 010 1.5H6.75a.75.75 0 010-1.5H11.25V2.25a.75.75 0 01.75-.75zM6.06 9.524a.75.75 0 01.442.88l-1.5 4.5a.75.75 0 11-1.408-.468l1.5-4.5a.75.75 0 01.966-.412zm11.88 0a.75.75 0 01.966.412l1.5 4.5a.75.75 0 11-1.408.468l-1.5-4.5a.75.75 0 01.442-.88zM12 18a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V18.75a.75.75 0 01.75-.75z" /><path fill-rule="evenodd" d="M15.28 7.5H8.72a.75.75 0 000 1.5h6.56a.75.75 0 000-1.5zM4.686 16.5a.75.75 0 01.53-.22h13.568a.75.75 0 01.53.22l1.323 1.323a.75.75 0 010 1.06l-1.323 1.323a.75.75 0 01-.53.22H5.216a.75.75 0 01-.53-.22L3.363 18.884a.75.75 0 010-1.06l1.323-1.323z" clip-rule="evenodd" /></svg>`,
-    hemato: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M4.5 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM15 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" /><path d="M12 2.25c-5.523 0-10 3.023-10 6.75s4.477 6.75 10 6.75 10-3.023 10-6.75S17.523 2.25 12 2.25zM4.067 9.172a8.513 8.513 0 015.197-2.618 1.5 1.5 0 10-.728-2.887 11.513 11.513 0 00-6.98 3.593.75.75 0 00.255 1.05A.75.75 0 004.067 9.172zM12 14.25a7.5 7.5 0 01-7.443-7.009A.75.75 0 003.75 6.75a.75.75 0 00-.525.223A8.995 8.995 0 002.25 9c0 3.866 4.03 7 9 7s9-3.134 9-7c0-.28-.013-.559-.038-.83a.75.75 0 00-.472-.663A.75.75 0 0019.5 7.5a.75.75 0 00-.568.243A7.5 7.5 0 0112 14.25z" /></svg>`,
-    neuro: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M15.75 9.75a4.5 4.5 0 11-8.528-2.227.75.75 0 00-1.428.473A6 6 0 1017.25 9.75a.75.75 0 00-1.5 0z" /><path d="M12 3.75a.75.75 0 00-.75.75V11.25a.75.75 0 001.5 0V4.5a.75.75 0 00-.75-.75z" /><path d="M12.75 12.75a.75.75 0 00-1.5 0v5.69l-1.846-1.615a.75.75 0 00-1.016 1.102l3.25 2.844a.75.75 0 001.016 0l3.25-2.844a.75.75 0 10-1.016-1.102L12.75 18.44v-5.69z" /></svg>`,
-    reumato: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd" /></svg>`,
-    infecto: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.533A9.75 9.75 0 001.5 12c0 5.385 4.365 9.75 9.75 9.75s9.75-4.365 9.75-9.75c0-4.88-3.548-8.95-8.25-9.667v1.613a1.5 1.5 0 01-1.5 1.5H9a1.5 1.5 0 01-1.5-1.5V5.25a.75.75 0 00-.75-.75h-.75a.75.75 0 00-.75.75v3a.75.75 0 001.5 0v-1.5h.75a.75.75 0 00.75-.75V6h1.5a.75.75 0 00.75-.75V4.533zM9 10.5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zm7.5 1.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>`,
-};
 
 document.addEventListener('DOMContentLoaded', function () {
     // --- DOM Element Cache ---
@@ -50,19 +38,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const exportBtn = getElem('export-btn');
     const importBtn = getElem('import-btn');
     const importFileInput = getElem('import-file-input');
+    const exportNoteBtn = getElem('export-note-btn');
+    const importNoteBtn = getElem('import-note-btn');
+    const importNoteFileInput = getElem('import-note-file-input');
     const settingsBtn = getElem('settings-btn');
     const settingsDropdown = getElem('settings-dropdown');
     const confidenceFiltersContainer = getElem('confidence-filters');
-    const iconPickerModal = getElem('icon-picker-modal');
-    const iconPickerGrid = getElem('icon-picker-grid');
-    const closeIconPickerBtn = getElem('close-icon-picker-btn');
+    const saveConfirmation = getElem('save-confirmation');
+    const toggleReadOnlyBtn = getElem('toggle-readonly-btn');
 
     // --- State Variables ---
     let activeConfidenceFilter = 'all';
     let activeLinkCell = null;
     let activeNoteIcon = null;
-    let activeSectionIconContainer = null;
     let selectedImageForResize = null;
+    let saveTimeout;
 
     const grandTotalSpans = {
         fuse: getElem('total-fuse'),
@@ -162,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cellEl.appendChild(createLecturaCellContent());
         });
 
-        document.querySelectorAll('tr[data-section] td:nth-child(2)').forEach((td) => {
+        document.querySelectorAll('tr[data-topic-id] td:nth-child(2)').forEach((td) => {
             const topicTextSpan = document.createElement('span');
             topicTextSpan.className = 'topic-text';
             while (td.firstChild) {
@@ -181,13 +171,253 @@ document.addEventListener('DOMContentLoaded', function () {
             td.appendChild(confidenceContainer);
         });
     }
+    
+    function setupEditorToolbar() {
+        editorToolbar.innerHTML = ''; // Clear existing toolbar
+
+        const createButton = (title, content, command, value = null) => {
+            const btn = document.createElement('button');
+            btn.className = 'toolbar-btn';
+            btn.title = title;
+            btn.innerHTML = content;
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (command) {
+                    document.execCommand(command, false, value);
+                }
+                notesEditor.focus();
+            });
+            return btn;
+        };
+
+        const createSeparator = () => {
+            const sep = document.createElement('div');
+            sep.className = 'toolbar-separator';
+            return sep;
+        };
+
+        const createColorPalette = (command, mainColors, extraColors) => {
+            const group = document.createElement('div');
+            group.className = 'color-palette-group';
+            
+            mainColors.forEach(color => {
+                const swatch = document.createElement('button');
+                swatch.className = 'color-swatch toolbar-btn';
+                swatch.style.backgroundColor = color;
+                swatch.title = color;
+                swatch.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.execCommand(command, false, color);
+                });
+                group.appendChild(swatch);
+            });
+            
+            const otherBtn = document.createElement('button');
+            otherBtn.className = 'other-colors-btn toolbar-btn';
+            otherBtn.textContent = '...';
+            otherBtn.title = 'Más colores';
+            group.appendChild(otherBtn);
+
+            const submenu = document.createElement('div');
+            submenu.className = 'color-submenu';
+            extraColors.forEach(color => {
+                const swatch = document.createElement('button');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                swatch.title = color;
+                swatch.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.execCommand(command, false, color);
+                    submenu.classList.remove('visible');
+                });
+                submenu.appendChild(swatch);
+            });
+
+            const customColorLabel = document.createElement('label');
+            customColorLabel.className = 'toolbar-btn';
+            customColorLabel.title = 'Color personalizado';
+            customColorLabel.innerHTML = '🎨';
+            const customColorInput = document.createElement('input');
+            customColorInput.type = 'color';
+            customColorInput.style.width = '0';
+            customColorInput.style.height = '0';
+            customColorInput.style.opacity = '0';
+            customColorInput.style.position = 'absolute';
+
+            customColorLabel.appendChild(customColorInput);
+            
+            customColorInput.addEventListener('input', (e) => {
+                document.execCommand(command, false, e.target.value);
+                notesEditor.focus();
+            });
+             customColorInput.addEventListener('click', (e) => e.stopPropagation());
+            submenu.appendChild(customColorLabel);
+
+            group.appendChild(submenu);
+
+            otherBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                document.querySelectorAll('.color-submenu.visible, .symbol-dropdown-content.visible').forEach(d => {
+                    if (d !== submenu) d.classList.remove('visible');
+                });
+                submenu.classList.toggle('visible');
+            });
+            
+            return group;
+        };
+
+        const createSymbolDropdown = (symbols) => {
+            const dropdown = document.createElement('div');
+            dropdown.className = 'symbol-dropdown';
+            
+            const btn = document.createElement('button');
+            btn.className = 'toolbar-btn';
+            btn.title = 'Insertar Símbolo';
+            btn.innerHTML = '📌';
+            dropdown.appendChild(btn);
+
+            const content = document.createElement('div');
+            content.className = 'symbol-dropdown-content';
+            symbols.forEach(symbol => {
+                const symbolBtn = createButton(symbol, symbol, 'insertText', symbol);
+                symbolBtn.classList.add('symbol-btn');
+                symbolBtn.addEventListener('click', () => content.classList.remove('visible'));
+                content.appendChild(symbolBtn);
+            });
+            dropdown.appendChild(content);
+
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const otherOpenDropdowns = document.querySelectorAll('.color-submenu.visible, .symbol-dropdown-content.visible');
+                otherOpenDropdowns.forEach(dropdownEl => {
+                    if (dropdownEl !== content) {
+                        dropdownEl.classList.remove('visible');
+                    }
+                });
+                content.classList.toggle('visible');
+            });
+
+            return dropdown;
+        };
+
+        // Font size selector
+        const selectSize = document.createElement('select');
+        selectSize.className = 'toolbar-select';
+        selectSize.title = 'Tamaño de letra';
+        const sizes = { 'Muy Pequeño': '1', 'Pequeño': '2', 'Normal': '3', 'Grande': '5', 'Muy Grande': '6' };
+        for (const [name, value] of Object.entries(sizes)) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = name;
+            if (value === '3') option.selected = true;
+            selectSize.appendChild(option);
+        }
+        selectSize.addEventListener('change', () => {
+            document.execCommand('fontSize', false, selectSize.value);
+        });
+        editorToolbar.appendChild(selectSize);
+
+        // Line height selector
+        const selectLineHeight = document.createElement('select');
+        selectLineHeight.className = 'toolbar-select';
+        selectLineHeight.title = 'Interlineado';
+        const lineHeights = { 'Sencillo': '1.2', 'Normal': '1.6', 'Medio': '2.0', 'Doble': '2.4' };
+        for (const [name, value] of Object.entries(lineHeights)) {
+            const option = document.createElement('option');
+            option.value = value;
+            option.textContent = name;
+            if (value === '1.6') option.selected = true;
+            selectLineHeight.appendChild(option);
+        }
+        selectLineHeight.addEventListener('change', () => {
+            notesEditor.style.lineHeight = selectLineHeight.value;
+            notesEditor.focus();
+        });
+        editorToolbar.appendChild(selectLineHeight);
+
+        editorToolbar.appendChild(createSeparator());
+
+        // Basic formatting
+        editorToolbar.appendChild(createButton('Negrita', '<b>B</b>', 'bold'));
+        editorToolbar.appendChild(createButton('Cursiva', '<i>I</i>', 'italic'));
+        editorToolbar.appendChild(createButton('Subrayado', '<u>U</u>', 'underline'));
+        editorToolbar.appendChild(createButton('Tachado', '<s>S</s>', 'strikeThrough'));
+        editorToolbar.appendChild(createSeparator());
+
+        // Color Palettes
+        const textColors = ['#000000', '#0000FF', '#008000'];
+        const extraTextColors = ['#FF0000', '#FFA500', '#FFFF00', '#800080', '#FFC0CB', '#00FFFF', '#00008B', '#8B0000', '#FF8C00', '#FFD700', '#ADFF2F', '#4B0082', '#48D1CC', '#191970', '#A52A2A', '#F0E68C', '#ADD8E6', '#DDA0DD', '#90EE90', '#FA8072'];
+        const highlightColors = ['#FFFF00', '#ADD8E6', '#FFC0CB'];
+        const extraHighlightColors = ['#F0FFF0', '#FFF0F5', '#F5FFFA', '#F0F8FF', '#FAFAD2', '#E6E6FA', '#FFF5EE', '#FAEBD7', '#FFE4E1', '#FFFFE0', '#D3FFD3', '#B0E0E6', '#FFB6C1', '#F5DEB3', '#C8A2C8', '#FFDEAD', '#E0FFFF', '#FDF5E6', '#FFFACD', '#F8F8FF'];
+        
+        editorToolbar.appendChild(createColorPalette('foreColor', textColors, extraTextColors));
+        editorToolbar.appendChild(createColorPalette('hiliteColor', highlightColors, extraHighlightColors));
+        editorToolbar.appendChild(createSeparator());
+
+        // Indentation
+        const outdentSVG = `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zM7 8v8l-4-4 4-4zm4-4h10V3H11v1zm0 4h10V7H11v2zm0 4h10v-2H11v2zm0 4h10v-2H11v2z"></path></svg>`;
+        const indentSVG = `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18v-2H3v2zM3 3v2h18V3H3zm8 4h10V5H11v2zm0 4h10V9H11v2zm0 4h10v-2H11v2zM3 8v8l4-4-4-4z"/></svg>`;
+        editorToolbar.appendChild(createButton('Disminuir Sangría', outdentSVG, 'outdent'));
+        editorToolbar.appendChild(createButton('Aumentar Sangría', indentSVG, 'indent'));
+        editorToolbar.appendChild(createSeparator());
+
+        // Symbols
+        const symbols = ["💡", "⚠️", "📌", "📍", "✴️", "🟢", "🟡", "🔴", "✅", "☑️", "❌", "➡️", "⬅️", "➔", "👉", "↳", "▪️", "▫️", "🔵", "🔹", "🔸", "➕", "➖", "📂", "📄", "📝", "📋", "📎", "🔑", "📈", "📉", "🩺", "💉", "💊", "🩸", "🧪", "🔬", "🩻", "🦠"];
+        editorToolbar.appendChild(createSymbolDropdown(symbols));
+
+        // Image controls
+        const imageBtn = createButton('Insertar Imagen desde URL', '🖼️', null);
+        imageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const url = prompt("Ingresa la URL de la imagen:");
+            if (url) {
+                notesEditor.focus();
+                document.execCommand('insertImage', false, url);
+            }
+        });
+        editorToolbar.appendChild(imageBtn);
+        
+        const resizePlusBtn = createButton('Aumentar tamaño de imagen (+10%)', '+', null);
+        resizePlusBtn.addEventListener('click', () => resizeSelectedImage(1.1));
+        editorToolbar.appendChild(resizePlusBtn);
+
+        const resizeMinusBtn = createButton('Disminuir tamaño de imagen (-10%)', '-', null);
+        resizeMinusBtn.addEventListener('click', () => resizeSelectedImage(0.9));
+        editorToolbar.appendChild(resizeMinusBtn);
+        editorToolbar.appendChild(createSeparator());
+
+        // Print/Save
+        const printBtn = createButton('Imprimir o Guardar como PDF', '💾', null);
+        printBtn.addEventListener('click', () => {
+             const printArea = getElem('print-area');
+             printArea.innerHTML = `<div style="line-height: ${notesEditor.style.lineHeight || 1.6}">${notesEditor.innerHTML}</div>`;
+             window.print();
+        });
+        editorToolbar.appendChild(printBtn);
+    }
+
+    function resizeSelectedImage(multiplier) {
+        if (selectedImageForResize) {
+            const currentWidth = selectedImageForResize.style.width
+                ? parseFloat(selectedImageForResize.style.width)
+                : selectedImageForResize.naturalWidth;
+            const newWidth = currentWidth * multiplier;
+            selectedImageForResize.style.width = `${newWidth}px`;
+            selectedImageForResize.style.height = 'auto'; // Keep aspect ratio
+        } else {
+            alert("Por favor, selecciona una imagen primero para cambiar su tamaño.");
+        }
+    }
 
     // --- Totals and Progress Calculation ---
     function updateAllTotals() {
         const grandTotals = { fuse: 0, notion: 0, gemini: 0, lectura: 0 };
         const grandApplicable = { fuse: 0, notion: 0, gemini: 0, lectura: 0 };
         
-        const allRows = document.querySelectorAll('tr[data-section]');
+        const allRows = document.querySelectorAll('tr[data-topic-id]');
+        const totalTopics = allRows.length;
         
         allRows.forEach(row => {
             ['fuse', 'notion', 'gemini'].forEach(col => {
@@ -196,17 +426,15 @@ document.addEventListener('DOMContentLoaded', function () {
                  const status = cell.dataset.status;
                  if (status === 'filled') {
                      grandTotals[col]++;
-                     grandApplicable[col]++;
-                 } else if (status === 'not-done') {
-                     grandApplicable[col]++;
                  }
+                 grandApplicable[col]++;
             });
             const counter = row.querySelector(`td[data-col="lectura"] .lectura-counter`);
             const count = parseInt(counter?.textContent || '0', 10);
             if(count > 0) {
                 grandTotals.lectura++;
             }
-            grandApplicable.lectura++; // For lectura, all rows are applicable
+            grandApplicable.lectura++; 
         });
 
         Object.keys(sections).forEach(sectionName => {
@@ -235,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
         
         ['fuse', 'notion', 'gemini', 'lectura'].forEach(colKey => {
             const completedCount = grandTotals[colKey];
-            const applicableCount = grandApplicable[colKey] || 0;
+            const applicableCount = totalTopics;
             
             const percentage = applicableCount > 0 ? Math.round((completedCount / applicableCount) * 100) : 0;
             grandTotalSpans[colKey].textContent = String(completedCount);
@@ -251,8 +479,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
-        const overallApplicable = grandApplicable.fuse + grandApplicable.notion + grandApplicable.gemini + grandApplicable.lectura;
         const overallCompleted = grandTotals.fuse + grandTotals.notion + grandTotals.gemini + grandTotals.lectura;
+        const overallApplicable = totalTopics * 4;
         const overallPercentage = overallApplicable > 0 ? (overallCompleted / overallApplicable) * 100 : 0;
         progressBar.style.width = overallPercentage + '%';
     }
@@ -261,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function () {
         Object.keys(sections).forEach(sectionName => {
             const sectionRows = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
             const count = sectionRows.length;
-            const headerRow = sections[sectionName].headerRow;
+            const headerRow = sections[sectionName]?.headerRow;
             if (headerRow) {
                 const countElement = headerRow.querySelector('.section-count');
                 if (countElement) {
@@ -271,991 +499,758 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // --- Modal and State Management ---
-    function loadNote(icon, noteData, defaultTitle) {
-        // Reset icon state
-        icon.classList.remove('has-note');
-        icon.title = defaultTitle;
-        icon.dataset.note = '';
+    // --- State Management ---
+    function getStateObject() {
+        const state = {
+            version: '2.5', // Updated version for compression
+            topics: {},
+            sections: {},
+            settings: {
+                theme: document.documentElement.dataset.theme,
+                iconStyle: document.documentElement.dataset.iconStyle,
+            },
+            headers: {}
+        };
 
-        if (!noteData) {
-            return '';
+        // Get editable header text
+        document.querySelectorAll('thead th[contenteditable="true"]').forEach((th, i) => {
+            state.headers[`h${i}`] = th.innerText;
+        });
+
+        // Get topic data using permanent IDs
+        document.querySelectorAll('tr[data-topic-id]').forEach(row => {
+            const topicId = row.dataset.topicId;
+            const notesData = {};
+
+            ['grey', 'blue'].forEach(noteType => {
+                 if (row.dataset[`${noteType}Note`]) {
+                    notesData[noteType] = {
+                        content: row.dataset[`${noteType}Note`],
+                        lineHeight: row.dataset[`${noteType}LineHeight`] || '1.6'
+                    };
+                }
+            });
+
+            const topicData = {
+                cells: {},
+                notes: notesData,
+                confidence: row.querySelector('.confidence-dot')?.dataset.confidenceLevel || '0',
+                noteTitle: row.dataset.noteTitle || row.querySelector('.topic-text').textContent
+            };
+
+            row.querySelectorAll('td[data-col]').forEach(cell => {
+                const col = cell.dataset.col;
+                if (col === 'lectura') {
+                    topicData.cells[col] = cell.querySelector('.lectura-counter')?.textContent || '0';
+                } else {
+                    topicData.cells[col] = {
+                        status: cell.dataset.status || 'default',
+                        link: cell.querySelector('.link-anchor')?.getAttribute('href') || '#'
+                    };
+                }
+            });
+
+            state.topics[topicId] = topicData;
+        });
+        
+        // Get section data
+        document.querySelectorAll('tr[data-section-header]').forEach(row => {
+            const sectionId = row.dataset.sectionHeader;
+            state.sections[sectionId] = {
+                isCollapsed: row.classList.contains('collapsed'),
+                title: row.querySelector('.section-title').textContent,
+                note: row.dataset.sectionNote || ''
+            };
+        });
+        
+        return state;
+    }
+
+    function loadState(state) {
+        if (!state) return;
+
+        // Apply settings
+        if(state.settings) {
+            applyTheme(state.settings.theme || 'default');
+            applyIconStyle(state.settings.iconStyle || 'solid');
         }
-    
-        let noteContent = '';
-        let lastModified;
-    
-        try {
-            const parsed = JSON.parse(noteData);
-            if (typeof parsed === 'object' && parsed !== null) {
-                noteContent = parsed.content || '';
-                lastModified = parsed.lastModified;
-            } else {
-                noteContent = noteData;
-            }
-        } catch (e) {
-            noteContent = noteData;
+
+        // Load headers
+        if(state.headers) {
+            document.querySelectorAll('thead th[contenteditable="true"]').forEach((th, i) => {
+                if(state.headers[`h${i}`]) {
+                    th.innerText = state.headers[`h${i}`];
+                }
+            });
         }
         
-        if (noteContent && noteContent.trim() !== '' && noteContent.trim() !== '<p><br></p>') {
-            icon.dataset.note = noteData; // Store the original JSON string
-            icon.classList.add('has-note');
-        
-            if (lastModified) {
-                const d = new Date(lastModified);
-                const formattedDate = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                icon.title = `${defaultTitle} (Modificado: ${formattedDate})`;
-            }
-        }
-    
-        return noteContent;
-    }
-    
-    function closeModal(modal) {
-        modal.classList.remove('visible');
-    }
-    
-    function openModal(modal) {
-        modal.classList.add('visible');
-    }
-    
-    // --- Event Listeners ---
-    tableBody.addEventListener('click', function (e) {
-        const target = e.target;
-    
-        // --- Handle clicks on specific interactive elements first ---
-    
-        const noteIcon = target.closest('.note-icon');
-        if (noteIcon) {
-            e.stopPropagation();
-            activeNoteIcon = noteIcon;
-            let topicTitle = '';
-            let defaultTooltip = '';
-            const noteData = activeNoteIcon.dataset.note || '';
-    
-            if (activeNoteIcon.classList.contains('section-note-icon')) {
-                const sectionHeaderEl = activeNoteIcon.closest('.section-header-row');
-                topicTitle = `Notas para: ${sectionHeaderEl?.querySelector('.section-title')?.textContent || 'Sección'}`;
-                defaultTooltip = 'Notas de la sección';
-            } else {
-                const row = activeNoteIcon.closest('tr');
-                const topicText = row?.querySelector('.topic-text')?.textContent || 'Tema';
-                const noteType = activeNoteIcon.dataset.noteType;
-                topicTitle = `${noteType === 'grey' ? 'Esquema' : 'Desarrollo'} para: ${topicText}`;
-                defaultTooltip = noteType === 'grey' ? 'Esquema' : 'Desarrollo';
-            }
-            
-            notesModalTitle.textContent = topicTitle;
-            const content = loadNote(activeNoteIcon, noteData, defaultTooltip);
-            notesEditor.innerHTML = content || ''; // Ensure it's never undefined
-            openModal(notesModal);
-            notesEditor.focus();
-            return;
-        }
-    
-        const editLinkIcon = target.closest('.edit-link-icon');
-        if (editLinkIcon) {
-            e.stopPropagation();
-            activeLinkCell = editLinkIcon.closest('td');
-            if (activeLinkCell) {
-                const linkAnchor = activeLinkCell.querySelector('.link-anchor');
-                const currentHref = linkAnchor.getAttribute('href');
-                linkInput.value = (currentHref && currentHref !== '#') ? currentHref : '';
-                openLinkPreviewBtn.href = linkInput.value || '#';
-                openModal(linkModal);
-                linkInput.focus();
-            }
-            return;
-        }
-    
-        const deleteLinksBtn = target.closest('.delete-section-links-btn');
-        if (deleteLinksBtn) {
-            e.stopPropagation();
-            const headerRow = deleteLinksBtn.closest('.section-header-row');
-            if (!headerRow) return;
-    
-            const sectionName = headerRow.dataset.sectionHeader;
-            if (confirm(`¿Estás seguro de que quieres eliminar todos los hipervínculos de esta sección? Esta acción no se puede deshacer.`)) {
-                const sectionRows = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
-                sectionRows.forEach(row => {
-                    row.querySelectorAll('.fillable-cell').forEach(cell => {
-                        const linkAnchor = cell.querySelector('a.link-anchor');
-                        if (linkAnchor) {
-                            linkAnchor.href = '#';
-                            linkAnchor.style.display = 'none';
+        // Load Topic Data
+        if (state.topics) {
+            for (const topicId in state.topics) {
+                const row = document.querySelector(`tr[data-topic-id="${topicId}"]`);
+                if (!row) continue;
+                
+                const topicData = state.topics[topicId];
+                
+                // Load cell statuses and links
+                if (topicData.cells) {
+                    for (const col in topicData.cells) {
+                        const cell = row.querySelector(`td[data-col="${col}"]`);
+                        if (!cell) continue;
+
+                        if (col === 'lectura') {
+                            const counter = cell.querySelector('.lectura-counter');
+                            const count = parseInt(topicData.cells[col] || '0', 10);
+                            if (counter) counter.textContent = count;
+                            cell.classList.toggle('lectura-filled', count > 0);
+                        } else {
+                            const cellData = topicData.cells[col];
+                            cell.dataset.status = cellData.status || 'default';
+                            cell.classList.toggle('filled', cellData.status === 'filled');
+                            cell.classList.toggle('not-done', cellData.status === 'not-done');
+                            
+                            const linkAnchor = cell.querySelector('.link-anchor');
+                            if (linkAnchor) {
+                                const link = cellData.link;
+                                if (link && link !== '#') {
+                                    linkAnchor.setAttribute('href', link);
+                                    linkAnchor.style.display = 'inline-flex';
+                                } else {
+                                    linkAnchor.setAttribute('href', '#');
+                                    linkAnchor.style.display = 'none';
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                // Load notes
+                if (topicData.notes) {
+                     ['grey', 'blue'].forEach(noteType => {
+                        const noteData = topicData.notes[noteType];
+                        const noteIcon = row.querySelector(`.note-icon[data-note-type="${noteType}"]`);
+                        if(noteIcon && noteData && noteData.content) {
+                            row.dataset[`${noteType}Note`] = noteData.content;
+                            row.dataset[`${noteType}LineHeight`] = noteData.lineHeight || '1.6';
+                            noteIcon.classList.add('has-note');
                         }
                     });
-                });
-                saveState();
-            }
-            return;
-        }
-    
-        const iconContainer = target.closest('.section-icon-container');
-        if (iconContainer) {
-            e.stopPropagation();
-            activeSectionIconContainer = iconContainer;
-            openModal(iconPickerModal);
-            return;
-        }
-    
-        const confidenceDot = target.closest('.confidence-dot');
-        if (confidenceDot) {
-            e.stopPropagation();
-            let level = parseInt(confidenceDot.dataset.confidenceLevel || '0', 10);
-            level = (level + 1) % 4; // Cycles 0 -> 1 -> 2 -> 3 -> 0
-            confidenceDot.dataset.confidenceLevel = String(level);
-            applyFiltersAndSearch();
-            saveState();
-            return;
-        }
-    
-        const sectionHeader = target.closest('.section-header-row');
-        if (sectionHeader) {
-            // Only toggle section if the click is not on one of the interactive icons inside it
-            if (!target.closest('.note-icon, .section-icon-container, .delete-section-links-btn')) {
-                const sectionName = sectionHeader.dataset.sectionHeader;
-                toggleSection(sectionName);
-                saveState();
-            }
-            return;
-        }
-        
-        // --- Handle clicks on the cell bodies ---
-    
-        const fillableCell = target.closest('.fillable-cell');
-        if (fillableCell) {
-            const currentStatus = fillableCell.dataset.status || 'default';
-            let nextStatus = 'default';
-    
-            if (currentStatus === 'default') {
-                nextStatus = 'filled';
-            } else if (currentStatus === 'filled') {
-                nextStatus = 'not-done';
-            } else if (currentStatus === 'not-done') {
-                nextStatus = 'default';
-            }
-            
-            fillableCell.dataset.status = nextStatus;
-            fillableCell.classList.remove('filled', 'not-done');
-            if (nextStatus !== 'default') {
-                fillableCell.classList.add(nextStatus);
-            }
-            updateAllTotals();
-            saveState();
-            return;
-        }
-    
-        const lecturaCell = target.closest('.lectura-cell');
-        if (lecturaCell) {
-            const counterSpan = lecturaCell.querySelector('.lectura-counter');
-            if (counterSpan) {
-                let count = parseInt(counterSpan.textContent, 10);
-                count = (count + 1) % 6; // Cycle 0-5
-                counterSpan.textContent = String(count);
-                lecturaCell.classList.toggle('lectura-filled', count > 0);
-                updateAllTotals();
-                saveState();
-            }
-            return;
-        }
-    });
-
-    linkInput.addEventListener('input', () => {
-        openLinkPreviewBtn.href = linkInput.value || '#';
-    });
-
-    // --- Editor Logic ---
-    function setupEditorToolbar() {
-        // Fix for command re-application issue by forcing the browser to use CSS.
-        document.execCommand('styleWithCSS', false, true);
-
-        const textColorPaletteHTML = `
-            <div class="color-palette" title="Color de Texto">
-                <button data-command="foreColor" data-color="#EF4444" class="color-swatch" style="background-color: #EF4444;"></button>
-                <button data-command="foreColor" data-color="#3B82F6" class="color-swatch" style="background-color: #3B82F6;"></button>
-                <button data-command="foreColor" data-color="#22C55E" class="color-swatch" style="background-color: #22C55E;"></button>
-                <div class="custom-color-picker">
-                    <input type="color" data-command="foreColor" list="text-custom-colors">
-                    <datalist id="text-custom-colors">
-                        <option>#ef4444</option><option>#f97316</option><option>#f59e0b</option><option>#eab308</option>
-                        <option>#84cc16</option><option>#22c55e</option><option>#10b981</option><option>#14b8a6</option>
-                        <option>#06b6d4</option><option>#0ea5e9</option><option>#3b82f6</option><option>#6366f1</option>
-                        <option>#8b5cf6</option><option>#a855f7</option><option>#d946ef</option><option>#ec4899</option>
-                    </datalist>
-                </div>
-            </div>
-        `;
-
-        const highlightColorPaletteHTML = `
-            <div class="color-palette" title="Resaltar Texto">
-                <button data-command="hiliteColor" data-color="#FEF08A" class="color-swatch" style="background-color: #FEF08A;"></button>
-                <button data-command="hiliteColor" data-color="#BAE6FD" class="color-swatch" style="background-color: #BAE6FD;"></button>
-                <button data-command="hiliteColor" data-color="#FECACA" class="color-swatch" style="background-color: #FECACA;"></button>
-                <div class="custom-color-picker">
-                    <input type="color" data-command="hiliteColor" list="highlight-custom-colors">
-                    <datalist id="highlight-custom-colors">
-                        <option>#fef08a</option><option>#d9f99d</option><option>#a7f3d0</option><option>#a5f3fc</option>
-                        <option>#bae6fd</option><option>#c7d2fe</option><option>#e9d5ff</option><option>#fbcfe8</option>
-                        <option>#fecaca</option><option>#fed7aa</option><option>#fde68a</option><option>#bbf7d0</option>
-                        <option>#99f6e4</option><option>#a5f3fc</option><option>#bfdbfe</option><option>#ddd6fe</option>
-                    </datalist>
-                </div>
-            </div>
-        `;
-
-        editorToolbar.innerHTML = `
-            <div class="relative">
-                <select id="font-size-selector" class="appearance-none w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-sm rounded-md py-1.5 pl-2 pr-8 focus:outline-none focus:ring-2 focus:ring-sky-400" title="Tamaño de Fuente">
-                    <option value="" disabled selected>Tamaño</option>
-                    <option value="1">Muy Pequeño</option>
-                    <option value="2">Pequeño</option>
-                    <option value="3">Normal</option>
-                    <option value="5">Grande</option>
-                    <option value="7">Muy Grande</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
-                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                </div>
-            </div>
-            <button data-command="bold" title="Negrita" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><b>B</b></button>
-            <button data-command="italic" title="Cursiva" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><i>I</i></button>
-            <button data-command="underline" title="Subrayado" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><u>U</u></button>
-            <div class="h-5 border-l border-gray-300 dark:border-gray-600 mx-1"></div>
-            ${textColorPaletteHTML}
-            ${highlightColorPaletteHTML}
-            <div class="h-5 border-l border-gray-300 dark:border-gray-600 mx-1"></div>
-            <button data-command="indent" title="Aumentar Sangría" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 8.25L19.5 12m0 0l-3.75 3.75M19.5 12H3.75" /></svg></button>
-            <button data-command="outdent" title="Disminuir Sangría" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 8.25L4.5 12m0 0l3.75 3.75M4.5 12h15" /></svg></button>
-            <button data-command="insertUnorderedList" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Viñetas"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10zm0 5.25a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 15.25z" clip-rule="evenodd" /></svg></button>
-            <div class="relative">
-                <button id="symbol-palette-btn" title="Insertar Símbolo" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9.25a.75.75 0 000 1.5h6a.75.75 0 000-1.5H7zM6.25 12a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12zm7.5 0a.75.75 0 01.75-.75h.01a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h-.01a.75.75 0 01-.75-.75V12z" clip-rule="evenodd" />
-                    </svg>
-                </button>
-                <div id="symbol-palette" class="hidden absolute top-full mt-2 left-0 z-20 w-max bg-secondary border border-border-color rounded-lg shadow-xl p-2 grid grid-cols-10 gap-1">
-                    <!-- populated by JS -->
-                </div>
-            </div>
-            <div class="h-5 border-l border-gray-300 dark:border-gray-600 mx-1"></div>
-            <button data-command="insertImage" title="Insertar Imagen desde URL" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M1 5.25A2.25 2.25 0 013.25 3h13.5A2.25 2.25 0 0119 5.25v9.5A2.25 2.25 0 0116.75 17H3.25A2.25 2.25 0 011 14.75v-9.5zm1.5 5.81v3.69c0 .414.336.75.75.75h13.5a.75.75 0 00.75-.75v-2.69l-2.22-2.219a.75.75 0 00-1.06 0l-1.91 1.909a.75.75 0 01-1.06 0l-2.22-2.22a.75.75 0 00-1.06 0l-2.22 2.22a.75.75 0 01-1.06 0l-1.53-1.531a.75.75 0 00-1.06 0zM5 7a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd" /></svg></button>
-            <button id="increase-image-btn" title="Aumentar Tamaño de Imagen" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg></button>
-            <button id="decrease-image-btn" title="Disminuir Tamaño de Imagen" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clip-rule="evenodd" /></svg></button>
-            <div class="h-5 border-l border-gray-300 dark:border-gray-600 mx-1"></div>
-            <button id="improve-text-btn" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Mejorar texto con IA">✨</button>
-            <button id="print-note-btn" class="p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700" title="Imprimir/PDF"><svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6 18.25m0 0a2.25 2.25 0 002.25 2.25h5.5A2.25 2.25 0 0016 18.25m-1.75-4.421l-1.44-1.44a1.5 1.5 0 00-2.12 0l-1.44 1.44m11.316 0a48.426 48.426 0 01-11.316 0m11.316 0V7.5A2.25 2.25 0 0018 5.25h-5.5a2.25 2.25 0 00-2.25 2.25v.632m1.38-2.886A2.252 2.252 0 0110.5 3h3a2.252 2.252 0 012.12 1.5Z" /></svg></button>
-            `;
-        
-        // --- Populate and handle symbol palette ---
-        const symbolPalette = editorToolbar.querySelector('#symbol-palette');
-        const symbolPaletteBtn = editorToolbar.querySelector('#symbol-palette-btn');
-        if (symbolPalette && symbolPaletteBtn) {
-            const symbols = ['💡','⚠️','🔹','🔸','📝','📌','📍','📎','➔','➖','・','☑️','☐','✅','💊','💉','🩸','⚡','🦠','🧬'];
-            symbolPalette.innerHTML = symbols.map(s => `<button type="button" class="p-1 rounded hover:bg-gray-300 dark:hover:bg-gray-600 text-lg flex items-center justify-center">${s}</button>`).join('');
-            
-            symbolPaletteBtn.addEventListener('click', e => {
-                e.stopPropagation();
-                symbolPalette.classList.toggle('hidden');
-            });
-    
-            symbolPalette.addEventListener('click', e => {
-                const button = e.target.closest('button');
-                if (button) {
-                    const symbol = button.textContent;
-                    notesEditor.focus();
-                    document.execCommand('insertText', false, symbol);
-                    symbolPalette.classList.add('hidden');
                 }
-            });
-        }
-        
-        editorToolbar.addEventListener('mousedown', e => {
-            if (e.target.tagName !== 'SELECT' && e.target.parentElement.tagName !== 'SELECT') {
-                 e.preventDefault();
-            }
-        });
 
-        editorToolbar.querySelector('#font-size-selector').addEventListener('change', (e) => {
-            const size = e.target.value;
-            if (size) { // Make sure not to run on the placeholder
-                notesEditor.focus();
-                document.execCommand('fontSize', false, size);
-                e.target.value = ''; // Reset to placeholder
-            }
-        });
-
-        editorToolbar.addEventListener('click', (e) => {
-            const button = e.target.closest('button[data-command]');
-            if (button) {
-                const command = button.dataset.command;
-                const color = button.dataset.color;
-                
-                if (command === 'insertImage') {
-                    const url = prompt('Ingresa la URL de la imagen:');
-                    if (url) document.execCommand('insertImage', false, url);
-                } else if (command === 'foreColor' || command === 'hiliteColor') {
-                    if (color) document.execCommand(command, false, color);
-                } else {
-                    document.execCommand(command, false, null);
+                // Load confidence level
+                const confidenceDot = row.querySelector('.confidence-dot');
+                if (confidenceDot && topicData.confidence) {
+                    confidenceDot.dataset.confidenceLevel = topicData.confidence;
                 }
-                notesEditor.focus();
-            } else {
-                const printButton = e.target.closest('#print-note-btn');
-                if(printButton) printCurrentNote();
-                
-                const improveButton = e.target.closest('#improve-text-btn');
-                if(improveButton) improveTextWithAI();
-            }
-        });
 
-        editorToolbar.querySelectorAll('input[type="color"]').forEach(picker => {
-            picker.addEventListener('input', (e) => {
-                const command = e.target.dataset.command;
-                const value = e.target.value;
-                document.execCommand(command, false, value);
-                notesEditor.focus();
-            });
-        });
-        
-        const increaseImageBtn = editorToolbar.querySelector('#increase-image-btn');
-        const decreaseImageBtn = editorToolbar.querySelector('#decrease-image-btn');
-        const imageSizePresets = ['25%', '50%', '75%', '100%'];
-        
-        notesEditor.addEventListener('click', (e) => {
-            if (selectedImageForResize) {
-                selectedImageForResize.classList.remove('selected-for-resize');
-            }
-        
-            if (e.target.tagName === 'IMG') {
-                selectedImageForResize = e.target;
-                increaseImageBtn.disabled = false;
-                decreaseImageBtn.disabled = false;
-                selectedImageForResize.classList.add('selected-for-resize');
-            } else {
-                selectedImageForResize = null;
-                increaseImageBtn.disabled = true;
-                decreaseImageBtn.disabled = true;
-            }
-        });
-        
-        function resizeImage(direction) {
-            if (!selectedImageForResize) return;
-            const currentWidth = selectedImageForResize.style.width || '100%';
-            const currentIndex = imageSizePresets.indexOf(currentWidth);
-            let nextIndex = currentIndex;
-            
-            if (direction === 'increase') {
-                nextIndex = (currentIndex < imageSizePresets.length - 1) ? currentIndex + 1 : currentIndex;
-            } else { // decrease
-                nextIndex = (currentIndex > 0) ? currentIndex - 1 : currentIndex;
-            }
-
-            selectedImageForResize.style.width = imageSizePresets[nextIndex];
-            selectedImageForResize.style.height = 'auto';
-        }
-
-        increaseImageBtn.addEventListener('click', () => resizeImage('increase'));
-        decreaseImageBtn.addEventListener('click', () => resizeImage('decrease'));
-    }
-
-    async function improveTextWithAI() {
-        const selection = window.getSelection();
-        const textToImprove = (selection && selection.toString().trim().length > 0) 
-            ? selection.toString() 
-            : stripHtml(notesEditor.innerHTML);
-
-        if (!textToImprove.trim()) {
-            alert('No hay texto para mejorar. Selecciona texto o escribe algo en el editor.');
-            return;
-        }
-
-        const originalContent = notesEditor.innerHTML;
-        notesEditor.innerHTML += '<p class="text-purple-500 animate-pulse mt-2">Mejorando texto con IA...</p>';
-
-        const prompt = `Reformula y mejora el siguiente texto para que sea más claro, conciso y profesional, manteniendo el significado original. Devuelve solo el texto mejorado en formato HTML simple (usa <strong>, <em>, <ul>, <li>). Texto original:\n\n${textToImprove}`;
-
-        try {
-            const improvedText = await callGemini(prompt);
-            if (improvedText) {
-                 if (selection && selection.rangeCount > 0 && selection.toString().trim().length > 0) {
-                    const range = selection.getRangeAt(0);
-                    range.deleteContents();
-                    const newContent = document.createRange().createContextualFragment(improvedText);
-                    range.insertNode(newContent);
-                 } else {
-                    notesEditor.innerHTML = improvedText;
-                 }
-            } else {
-                notesEditor.innerHTML = originalContent;
-                alert('La IA no pudo mejorar el texto.');
-            }
-        } catch (e) {
-            notesEditor.innerHTML = originalContent; // Restore original content on error
-            alert('Error al contactar la IA para mejorar el texto.');
-            console.error(e);
-        }
-    }
-    
-    function saveCurrentNote() {
-        if (!activeNoteIcon) return;
-
-        const content = notesEditor.innerHTML;
-        const noteObject = { content, lastModified: new Date().toISOString() };
-        const noteData = JSON.stringify(noteObject);
-
-        let baseTitle = 'Nota';
-        if(activeNoteIcon.classList.contains('section-note-icon')) {
-            baseTitle = 'Notas de sección';
-        } else if(activeNoteIcon.dataset.noteType === 'grey') {
-            baseTitle = 'Esquema';
-        } else if (activeNoteIcon.dataset.noteType === 'blue') {
-            baseTitle = 'Desarrollo';
-        }
-
-        activeNoteIcon.dataset.note = noteData;
-        const hasContent = content && content.trim() !== '' && content.trim() !== '<p><br></p>';
-
-        if (hasContent) {
-            activeNoteIcon.classList.add('has-note');
-            const d = new Date(noteObject.lastModified);
-            const formattedDate = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            activeNoteIcon.title = `${baseTitle} (Modificado: ${formattedDate})`;
-        } else {
-            activeNoteIcon.classList.remove('has-note');
-            activeNoteIcon.title = baseTitle;
-            activeNoteIcon.dataset.note = '';
-        }
-        
-        saveState();
-        
-        const saveConfirmation = document.getElementById('save-confirmation');
-        if (saveConfirmation) {
-            saveConfirmation.style.opacity = '1';
-            setTimeout(() => {
-                saveConfirmation.style.opacity = '0';
-            }, 2000);
-        }
-    }
-    
-    saveNoteBtn.addEventListener('click', saveCurrentNote);
-
-    saveAndCloseNoteBtn.addEventListener('click', () => {
-        saveCurrentNote();
-        closeModal(notesModal);
-    });
-
-    cancelNoteBtn.addEventListener('click', () => {
-        closeModal(notesModal);
-    });
-    
-    unmarkNoteBtn.addEventListener('click', () => {
-        if (!activeNoteIcon) return;
-        if (confirm('¿Estás seguro? Se borrará el contenido de la nota y se desmarcará el ícono.')) {
-            notesEditor.innerHTML = '';
-            saveCurrentNote();
-            closeModal(notesModal);
-        }
-    });
-
-    copyNoteTextBtn.addEventListener('click', () => {
-        const textToCopy = stripHtml(notesEditor.innerHTML);
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            alert('Texto de la nota copiado al portapapeles.');
-        }).catch(err => {
-            console.error('Error al copiar texto: ', err);
-        });
-    });
-
-    // --- Link Modal Handlers ---
-
-    saveLinkBtn.addEventListener('click', () => {
-        if (activeLinkCell) {
-            const linkAnchor = activeLinkCell.querySelector('a.link-anchor');
-            const url = linkInput.value.trim();
-            if (url) {
-                linkAnchor.href = url;
-                linkAnchor.style.display = 'inline-flex';
-            } else {
-                linkAnchor.href = '#';
-                linkAnchor.style.display = 'none';
-            }
-            saveState();
-            closeModal(linkModal);
-        }
-    });
-    
-    cancelLinkBtn.addEventListener('click', () => closeModal(linkModal));
-    
-    // --- State Persistence ---
-    function saveState() {
-        const state = {
-            cells: {},
-            lectura: {},
-            notes: {},
-            sectionNotes: {},
-            confidence: {},
-            collapsedSections: [],
-            theme: document.documentElement.dataset.theme || 'default',
-            iconStyle: document.documentElement.dataset.iconStyle || 'solid',
-            sectionIcons: {},
-            headerTitles: {}
-        };
-        
-        document.querySelectorAll('tr[data-section]').forEach((row, index) => {
-            const rowId = `row-${index}`;
-            const cellsInRow = row.querySelectorAll('td.fillable-cell');
-            cellsInRow.forEach(cell => {
-                const col = cell.dataset.col;
-                const cellId = `${rowId}-col-${col}`;
-                const link = cell.querySelector('a.link-anchor')?.getAttribute('href');
-                state.cells[cellId] = {
-                    status: cell.dataset.status,
-                    link: (link && link !== '#') ? link : null
-                };
-            });
-            
-            const lecturaCell = row.querySelector('.lectura-cell');
-            if (lecturaCell) {
-                const counter = lecturaCell.querySelector('.lectura-counter')?.textContent;
-                state.lectura[rowId] = counter || '0';
-            }
-
-            const noteIcons = row.querySelectorAll('.note-icon');
-            noteIcons.forEach(icon => {
-                const noteType = icon.dataset.noteType;
-                const noteId = `${rowId}-note-${noteType}`;
-                if (icon.dataset.note) {
-                    state.notes[noteId] = icon.dataset.note;
+                // Load note title
+                if (topicData.noteTitle) {
+                    row.dataset.noteTitle = topicData.noteTitle;
                 }
-            });
-
-            const confidenceDot = row.querySelector('.confidence-dot');
-            if (confidenceDot) {
-                state.confidence[rowId] = confidenceDot.dataset.confidenceLevel || '0';
             }
-        });
-
-        document.querySelectorAll('.section-header-row').forEach(headerRow => {
-            const sectionName = headerRow.dataset.sectionHeader;
-            const noteIcon = headerRow.querySelector('.section-note-icon');
-            if (noteIcon && noteIcon.dataset.note) {
-                state.sectionNotes[sectionName] = noteIcon.dataset.note;
-            }
-            if (headerRow.classList.contains('collapsed')) {
-                state.collapsedSections.push(sectionName);
-            }
-            const iconContainer = headerRow.querySelector('.section-icon-container');
-            if (iconContainer && iconContainer.dataset.iconName) {
-                state.sectionIcons[sectionName] = iconContainer.dataset.iconName;
-            }
-        });
-
-        document.querySelectorAll('thead th[contenteditable="true"]').forEach((th, index) => {
-            state.headerTitles[`header-${index}`] = th.textContent;
-        });
-
-        localStorage.setItem('medicinaInternaProgress', JSON.stringify(state));
-    }
-
-    function loadState() {
-        const savedStateJSON = localStorage.getItem('medicinaInternaProgress');
-        if (!savedStateJSON) {
-            updateAllTotals();
-            updateSectionHeaderCounts();
-            return;
         }
-        const state = JSON.parse(savedStateJSON);
-
-        document.querySelectorAll('tr[data-section]').forEach((row, index) => {
-            const rowId = `row-${index}`;
-            const cellsInRow = row.querySelectorAll('td.fillable-cell');
-            cellsInRow.forEach(cell => {
-                const col = cell.dataset.col;
-                const cellId = `${rowId}-col-${col}`;
-                const cellState = state.cells?.[cellId];
-                if (cellState) {
-                    cell.dataset.status = cellState.status;
-                    cell.classList.remove('filled', 'not-done');
-                    if (cellState.status !== 'default') {
-                         cell.classList.add(cellState.status);
+        
+        // Load Section Data
+        if (state.sections) {
+            for(const sectionId in state.sections) {
+                const sectionData = state.sections[sectionId];
+                const headerRow = document.querySelector(`tr[data-section-header="${sectionId}"]`);
+                if(headerRow) {
+                    if (sectionData.title) {
+                        headerRow.querySelector('.section-title').textContent = sectionData.title;
                     }
-                    const linkAnchor = cell.querySelector('a.link-anchor');
-                    if (linkAnchor && cellState.link) {
-                        linkAnchor.href = cellState.link;
-                        linkAnchor.style.display = 'inline-flex';
-                    } else if (linkAnchor) {
-                        linkAnchor.style.display = 'none';
+                    if (sectionData.note) {
+                        headerRow.dataset.sectionNote = sectionData.note;
+                        const noteIcon = headerRow.querySelector('.section-note-icon');
+                        if (noteIcon) noteIcon.classList.add('has-note');
+                    }
+                    if (sectionData.isCollapsed) {
+                        headerRow.classList.add('collapsed');
+                        document.querySelectorAll(`tr[data-section="${sectionId}"]`).forEach(r => r.style.display = 'none');
+                        const totalRow = getElem(`total-row-${sectionId}`);
+                        if (totalRow) totalRow.style.display = 'none';
                     }
                 }
-            });
-
-            if (state.lectura && state.lectura[rowId]) {
-                const lecturaCell = row.querySelector('.lectura-cell');
-                if(lecturaCell){
-                    lecturaCell.querySelector('.lectura-counter').textContent = state.lectura[rowId];
-                    lecturaCell.classList.toggle('lectura-filled', parseInt(state.lectura[rowId], 10) > 0);
-                }
             }
-            
-            row.querySelectorAll('.note-icon').forEach(icon => {
-                const noteType = icon.dataset.noteType;
-                const noteId = `${rowId}-note-${noteType}`;
-                const noteData = state.notes?.[noteId];
-                if (noteData) {
-                    let defaultTitle = noteType === 'grey' ? 'Esquema' : 'Desarrollo';
-                    loadNote(icon, noteData, defaultTitle);
-                }
-            });
-
-            const confidence = state.confidence?.[rowId];
-            if (confidence) {
-                const dot = row.querySelector('.confidence-dot');
-                if (dot) dot.dataset.confidenceLevel = confidence;
-            }
-        });
-
-        document.querySelectorAll('.section-header-row').forEach(headerRow => {
-            const sectionName = headerRow.dataset.sectionHeader;
-            const noteData = state.sectionNotes?.[sectionName];
-            if (noteData) {
-                const noteIcon = headerRow.querySelector('.section-note-icon');
-                loadNote(noteIcon, noteData, 'Notas de sección');
-            }
-            
-            const iconName = state.sectionIcons?.[sectionName];
-            if (iconName && ICONS[iconName]) {
-                 const iconContainer = headerRow.querySelector('.section-icon-container');
-                 iconContainer.innerHTML = ICONS[iconName];
-                 iconContainer.dataset.iconName = iconName;
-            }
-        });
-        
-        if (state.theme) {
-            setTheme(state.theme);
-        }
-        if (state.iconStyle) {
-            setIconStyle(state.iconStyle);
-        }
-
-        if (state.headerTitles) {
-            document.querySelectorAll('thead th[contenteditable="true"]').forEach((th, index) => {
-                if (state.headerTitles[`header-${index}`]) {
-                    th.textContent = state.headerTitles[`header-${index}`];
-                }
-            });
         }
 
         updateAllTotals();
-        updateSectionHeaderCounts();
-        applyFiltersAndSearch(); // Apply filters on load
+        filterTable();
     }
-
-    // --- Search and Filter ---
-    function applyFiltersAndSearch() {
-        const searchTerm = searchBar.value.toLowerCase().trim();
-
-        document.querySelectorAll('tr[data-section]').forEach(row => {
-            const sectionName = row.dataset.section;
-            const headerRow = sections[sectionName]?.headerRow;
-
-            // If section is collapsed, row should be hidden
-            if (headerRow && headerRow.classList.contains('collapsed')) {
-                row.style.display = 'none';
-                return; // Go to next row
-            }
-            
-            const topicText = row.querySelector('.topic-text').textContent.toLowerCase();
-            const confidenceDot = row.querySelector('.confidence-dot');
-            const confidenceLevel = confidenceDot ? confidenceDot.dataset.confidenceLevel : '0';
-
-            const searchMatch = topicText.includes(searchTerm);
-            const filterMatch = activeConfidenceFilter === 'all' || confidenceLevel === activeConfidenceFilter;
-
-            if (searchMatch && filterMatch) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
-    }
-
-    searchBar.addEventListener('input', applyFiltersAndSearch);
     
-    confidenceFiltersContainer.addEventListener('click', (e) => {
-        const filterBtn = e.target.closest('.filter-btn');
-        if (!filterBtn) return;
-        
-        confidenceFiltersContainer.querySelector('.active').classList.remove('active');
-        filterBtn.classList.add('active');
-        activeConfidenceFilter = filterBtn.dataset.filter;
-        applyFiltersAndSearch();
-    });
-
-    // --- Import/Export ---
-    exportBtn.addEventListener('click', () => {
-        const stateJSON = localStorage.getItem('medicinaInternaProgress');
-        if (!stateJSON) {
-            alert('No hay progreso para exportar.');
-            return;
-        }
-        const blob = new Blob([stateJSON], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        const date = new Date().toISOString().slice(0, 10);
-        a.download = `progreso_medicina_${date}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
-
-    importBtn.addEventListener('click', () => importFileInput.click());
-    importFileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const importedState = JSON.parse(e.target.result);
-                // Basic validation
-                if (importedState && typeof importedState === 'object' && importedState.cells) {
-                    if (confirm('¿Importar datos? Esto sobreescribirá tu progreso actual.')) {
-                        localStorage.setItem('medicinaInternaProgress', JSON.stringify(importedState));
-                        window.location.reload();
-                    }
-                } else {
-                    alert('Archivo inválido o corrupto.');
-                }
-            } catch (error) {
-                alert('Error al leer el archivo. Asegúrate de que es un archivo de exportación válido.');
-                console.error(error);
-            } finally {
-                importFileInput.value = ''; // Reset input
-            }
-        };
-        reader.readAsText(file);
-    });
-    
-    // --- AI Functionality ---
-    async function callGemini(prompt) {
-        if (!API_KEY) {
-            throw new Error("API key not configured.");
-        }
-        const ai = new GoogleGenAI({ apiKey: API_KEY });
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt,
-        });
-        return response.text;
-    }
-
-    function gatherAllNotes() {
-        let allContent = "";
-        document.querySelectorAll('tr[data-section]').forEach(row => {
-            const topic = row.querySelector('.topic-text')?.textContent.trim();
-            if (topic) {
-                allContent += `\n\n## Tema: ${topic}\n`;
-            }
-
-            row.querySelectorAll('.note-icon').forEach(icon => {
-                const noteData = icon.dataset.note;
-                if (noteData) {
-                    try {
-                        const parsedNote = JSON.parse(noteData);
-                        const noteContent = stripHtml(parsedNote.content);
-                        if (noteContent.trim()) {
-                            const type = icon.dataset.noteType === 'grey' ? 'Esquema' : 'Desarrollo';
-                            allContent += `### ${type}:\n${noteContent}\n`;
-                        }
-                    } catch (e) { /* ignore parse error */ }
-                }
-            });
-        });
-
-        document.querySelectorAll('.section-header-row').forEach(header => {
-            const sectionName = header.querySelector('.section-title')?.textContent.trim();
-            if (sectionName) {
-                allContent += `\n\n## Notas de Sección: ${sectionName}\n`;
-            }
-            const icon = header.querySelector('.section-note-icon');
-            if (icon && icon.dataset.note) {
-                 try {
-                        const parsedNote = JSON.parse(icon.dataset.note);
-                        const noteContent = stripHtml(parsedNote.content);
-                        if (noteContent.trim()) {
-                            allContent += `${noteContent}\n`;
-                        }
-                    } catch (e) { /* ignore parse error */ }
-            }
-        });
-        return allContent;
-    }
-
-    askAiBtn.addEventListener('click', () => {
-        aiResponseArea.innerHTML = '<p class="text-muted">Haz una pregunta sobre tus notas y la IA buscará la respuesta en todo el temario.</p>';
-        aiQuestionInput.value = '';
-        aiQaLoader.classList.add('hidden');
-        openModal(aiQaModal);
-    });
-
-    cancelAiQaBtn.addEventListener('click', () => closeModal(aiQaModal));
-    
-    sendAiQaBtn.addEventListener('click', async () => {
-        const question = aiQuestionInput.value.trim();
-        if (!question) return;
-
-        aiQaLoader.classList.remove('hidden');
-        aiResponseArea.innerHTML = '';
-        sendAiQaBtn.disabled = true;
-
+    function saveState() {
         try {
-            if (!API_KEY) {
-                throw new Error("API_KEY not configured for AI features.");
+            if (!window.pako) {
+                console.error("pako library not loaded!");
+                alert("Error: La librería de compresión no está disponible.");
+                return;
             }
-            const context = gatherAllNotes();
-            const prompt = `Basado en el siguiente contenido de estudio de medicina interna, responde a la pregunta del usuario. Proporciona una respuesta clara y concisa en formato HTML simple. Si no encuentras la respuesta, indica que no se encontró información sobre ese tema en las notas.\n\nContexto:\n${context}\n\nPregunta: ${question}`;
+            const state = getStateObject();
+            const stateString = JSON.stringify(state);
+            const compressed = window.pako.deflate(stateString);
             
-            const answer = await callGemini(prompt);
-            aiResponseArea.innerHTML = answer;
+            // Convert Uint8Array to a Base64 string to safely store in localStorage
+            let binaryString = '';
+            for (let i = 0; i < compressed.length; i++) {
+                binaryString += String.fromCharCode(compressed[i]);
+            }
+            const base64String = btoa(binaryString);
+            
+            localStorage.setItem('temarioProgresoV2_compressed', base64String);
+            localStorage.removeItem('temarioProgresoV2'); // Clean up old uncompressed data
+            showSaveConfirmation();
 
         } catch (error) {
-            console.error("AI Error:", error);
-            aiResponseArea.innerHTML = `<p class="text-red-500">Error: No se pudo conectar con el servicio de IA. Verifica tu clave de API y la conexión a internet.</p>`;
-        } finally {
-            aiQaLoader.classList.add('hidden');
-            sendAiQaBtn.disabled = false;
+            console.error("Error al guardar el estado:", error);
+            if (error.name === 'QuotaExceededError') {
+                alert("Error: El almacenamiento local está lleno, incluso después de la compresión. Por favor, exporta y borra algunas notas grandes.");
+            } else {
+                alert("Hubo un error desconocido al guardar tu progreso.");
+            }
         }
-    });
+    }
 
-    // --- Section Collapse/Expand ---
-    function toggleSection(sectionName, forceCollapse = false) {
-        const headerRow = sections[sectionName]?.headerRow;
-        const totalRow = sections[sectionName]?.totalRow;
+    function showSaveConfirmation() {
+        clearTimeout(saveTimeout);
+        saveConfirmation.classList.remove('opacity-0');
+        saveTimeout = setTimeout(() => {
+            saveConfirmation.classList.add('opacity-0');
+        }, 1500);
+    }
 
-        if (!headerRow || !totalRow) return;
-
-        const isCollapsed = headerRow.classList.contains('collapsed');
-
-        if (forceCollapse || !isCollapsed) {
-             headerRow.classList.add('collapsed');
-             totalRow.style.display = 'none';
+    function applyTheme(theme) {
+        document.documentElement.dataset.theme = theme;
+        const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (theme === 'default') {
+            document.documentElement.classList.toggle('dark', isDark);
         } else {
-             headerRow.classList.remove('collapsed');
-             totalRow.style.display = '';
+             document.documentElement.classList.remove('dark'); // Force light for themes
         }
+    }
+
+    function applyIconStyle(style) {
+        document.documentElement.dataset.iconStyle = style;
+    }
+
+    function showModal(modal) {
+        modal.classList.add('visible');
+    }
+
+    function hideModal(modal) {
+        modal.classList.remove('visible');
+    }
+
+    function handleTableClick(event) {
+        const target = event.target;
+        const cell = target.closest('td');
+        const row = target.closest('tr');
         
-        // After changing the state of the section, re-apply filters to update topic row visibility.
-        applyFiltersAndSearch();
-    }
-    
-    // --- Utility Functions ---
-    function stripHtml(html){
-       let doc = new DOMParser().parseFromString(html, 'text/html');
-       return doc.body.textContent || "";
-    }
-    
-    function printCurrentNote() {
-        const printArea = getElem('print-area');
-        const title = notesModalTitle.textContent;
-        const content = notesEditor.innerHTML;
-        printArea.innerHTML = `<h1 style="font-family: sans-serif; font-size: 24px; margin-bottom: 20px;">${title}</h1><div style="font-family: sans-serif; line-height: 1.6;">${content}</div>`;
-        window.print();
-        printArea.innerHTML = '';
-    }
+        if (!cell || !row) return;
 
-    // --- Settings, Themes & Styles ---
-    function setTheme(themeName) {
-        document.documentElement.setAttribute('data-theme', themeName);
-        saveState();
-    }
-    
-    function setIconStyle(styleName) {
-        document.documentElement.setAttribute('data-icon-style', styleName);
-        saveState();
-    }
-
-    settingsBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        settingsDropdown.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
-            settingsDropdown.classList.add('hidden');
-        }
-        const symbolPaletteContainer = document.querySelector('#symbol-palette-btn')?.parentElement;
-        if (symbolPaletteContainer && !symbolPaletteContainer.contains(e.target)) {
-            const palette = symbolPaletteContainer.querySelector('#symbol-palette');
-            if (palette) palette.classList.add('hidden');
-        }
-    });
-
-    settingsDropdown.addEventListener('click', (e) => {
-        e.preventDefault();
-        const themeOption = e.target.closest('.theme-option');
-        if (themeOption) {
-            setTheme(themeOption.dataset.theme);
-        }
-        const iconOption = e.target.closest('.icon-style-option');
-        if (iconOption) {
-            setIconStyle(iconOption.dataset.style);
-        }
-    });
-    
-    document.querySelectorAll('thead th[contenteditable="true"]').forEach(th => {
-        th.addEventListener('blur', saveState);
-    });
-
-    // --- Section Icon Picker ---
-    function populateIconPicker() {
-        iconPickerGrid.innerHTML = '';
-        Object.keys(ICONS).forEach(iconName => {
-            const item = document.createElement('div');
-            item.className = 'icon-picker-item';
-            item.dataset.iconName = iconName;
-            item.innerHTML = ICONS[iconName];
-            item.title = iconName;
-            iconPickerGrid.appendChild(item);
-        });
-    }
-
-    iconPickerGrid.addEventListener('click', (e) => {
-        const iconItem = e.target.closest('.icon-picker-item');
-        if (iconItem && activeSectionIconContainer) {
-            const iconName = iconItem.dataset.iconName;
-            activeSectionIconContainer.innerHTML = ICONS[iconName];
-            activeSectionIconContainer.dataset.iconName = iconName;
+        // --- Confidence Dot Click ---
+        if(target.classList.contains('confidence-dot')) {
+            event.stopPropagation();
+            const currentLevel = parseInt(target.dataset.confidenceLevel || '0');
+            const nextLevel = (currentLevel % 3) + 1;
+            target.dataset.confidenceLevel = String(nextLevel);
             saveState();
-            closeModal(iconPickerModal);
+            // After changing a color, we might need to re-apply the filter
+            filterTable();
+            return;
         }
-    });
 
-    closeIconPickerBtn.addEventListener('click', () => closeModal(iconPickerModal));
+        // --- Link Cell Click ---
+        if (target.closest('.edit-link-icon')) {
+            event.preventDefault();
+            event.stopPropagation();
+            activeLinkCell = cell;
+            const link = cell.querySelector('.link-anchor').getAttribute('href');
+            linkInput.value = (link && link !== '#') ? link : '';
+            openLinkPreviewBtn.href = linkInput.value;
+            openLinkPreviewBtn.classList.toggle('hidden', !linkInput.value);
+            showModal(linkModal);
+        }
 
+        // --- Note Icon Click ---
+        if (target.closest('.note-icon')) {
+            event.preventDefault();
+            event.stopPropagation(); // Stop propagation to prevent overlay click
+            activeNoteIcon = target.closest('.note-icon');
+            const topicRow = activeNoteIcon.closest('tr');
+            const noteType = activeNoteIcon.dataset.noteType;
+            let topicTitle;
+            let noteTitlePrefix;
 
-    // --- Initialization ---
-    function initializeApp() {
-        initializeCells();
-        populateIconPicker();
-        document.querySelectorAll('.section-icon-container').forEach(container => {
-            const sectionName = container.closest('.section-header-row').dataset.sectionHeader;
-            const iconKey = Object.keys(ICONS).find(k => k === sectionName) || 'default';
-            container.innerHTML = ICONS[iconKey];
-            container.dataset.iconName = iconKey;
-        });
-        setupEditorToolbar();
-        loadState();
-        if (!API_KEY || API_KEY === '') {
-            askAiBtn.disabled = true;
-            askAiBtn.title = 'Se necesita una clave API para usar las funciones de IA';
-            askAiBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            const improveBtn = getElem('improve-text-btn');
-            if (improveBtn) improveBtn.style.display = 'none';
+            if (activeNoteIcon.classList.contains('section-note-icon')) {
+                 topicTitle = topicRow.querySelector('.section-title').textContent;
+                 noteTitlePrefix = "Notas para: ";
+            } else {
+                 topicTitle = topicRow.querySelector('.topic-text').textContent;
+                 noteTitlePrefix = (noteType === 'grey' ? 'Esquema para: ' : 'Desarrollo para: ');
+            }
+            
+            notesModalTitle.textContent = topicRow.dataset.noteTitle || `${noteTitlePrefix}${topicTitle}`;
+            
+            const savedContent = topicRow.dataset[`${noteType}Note`] || '';
+            const savedLineHeight = topicRow.dataset[`${noteType}LineHeight`] || '1.6';
+            
+            notesEditor.innerHTML = savedContent;
+            notesEditor.style.lineHeight = savedLineHeight;
+            editorToolbar.querySelector('.toolbar-select[title="Interlineado"]').value = savedLineHeight;
+
+            showModal(notesModal);
+        }
+
+        // --- Lectura Cell Click ---
+        if (cell.classList.contains('lectura-cell') && !target.closest('.note-icon')) {
+             const counter = cell.querySelector('.lectura-counter');
+             let count = parseInt(counter.textContent, 10);
+
+             if (event.ctrlKey || event.metaKey) { // Decrement with Ctrl/Cmd key
+                count = Math.max(0, count - 1);
+            } else {
+                count = (count + 1) % 6; // Cycle 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 0
+            }
+             counter.textContent = String(count);
+             cell.classList.toggle('lectura-filled', count > 0);
+             updateAllTotals();
+             saveState();
+        }
+
+        // --- Fillable Cell Click ---
+        if (cell.classList.contains('fillable-cell') && !target.closest('.edit-link-icon') && !target.closest('.link-anchor')) {
+            const currentStatus = cell.dataset.status || 'default';
+            let newStatus;
+            
+            if (currentStatus === 'default') {
+                newStatus = 'filled';
+            } else if (currentStatus === 'filled') {
+                newStatus = 'not-done';
+            } else {
+                newStatus = 'default';
+            }
+            
+            cell.dataset.status = newStatus;
+            cell.classList.toggle('filled', newStatus === 'filled');
+            cell.classList.toggle('not-done', newStatus === 'not-done');
+            
+            updateAllTotals();
+            saveState();
+        }
+
+        // --- Section Header Click ---
+        if (row.classList.contains('section-header-row') && !target.closest('.note-icon') && !target.closest('.print-section-btn')) {
+            const sectionName = row.dataset.sectionHeader;
+            row.classList.toggle('collapsed');
+            const isCollapsed = row.classList.contains('collapsed');
+            const displayStyle = isCollapsed ? 'none' : 'table-row';
+            
+            document.querySelectorAll(`tr[data-section="${sectionName}"]`).forEach(r => {
+                r.style.display = displayStyle;
+            });
+            
+            const totalRow = getElem(`total-row-${sectionName}`);
+            if (totalRow) {
+                totalRow.style.display = displayStyle;
+            }
+            
+            saveState();
+        }
+
+        // --- Print Section Notes Click ---
+        if (target.closest('.print-section-btn')) {
+            event.stopPropagation();
+            const sectionHeaderRow = target.closest('.section-header-row');
+            const sectionName = sectionHeaderRow.dataset.sectionHeader;
+            const topicRows = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
+            
+            const notesToPrint = [];
+            topicRows.forEach(topicRow => {
+                const greyNote = topicRow.dataset.greyNote;
+                if (greyNote) {
+                    notesToPrint.push(`<div>${greyNote}</div>`);
+                }
+                const blueNote = topicRow.dataset.blueNote;
+                if (blueNote) {
+                    notesToPrint.push(`<div>${blueNote}</div>`);
+                }
+            });
+
+            if (notesToPrint.length > 0) {
+                const printArea = getElem('print-area');
+                printArea.innerHTML = notesToPrint.join('<div style="page-break-before: always;"></div>');
+                window.print();
+            } else {
+                alert('No hay notas en esta sección para imprimir.');
+            }
+            return;
         }
     }
-    
-    initializeApp();
 
+    function handleSearch() {
+        filterTable();
+    }
+    
+    function filterTable() {
+        const searchTerm = searchBar.value.toLowerCase();
+        const isConfidenceFilterActive = activeConfidenceFilter !== 'all';
+
+        // 1. Filter topic rows based on search and confidence
+        document.querySelectorAll('tr[data-topic-id]').forEach(row => {
+            const topicText = (row.querySelector('.topic-text')?.textContent || '').toLowerCase();
+            const matchesSearch = topicText.includes(searchTerm);
+            
+            const confidenceDot = row.querySelector('.confidence-dot');
+            const confidenceLevel = confidenceDot ? confidenceDot.dataset.confidenceLevel : '0';
+            const matchesConfidence = (activeConfidenceFilter === 'all' || confidenceLevel === activeConfidenceFilter);
+
+            row.style.display = (matchesSearch && matchesConfidence) ? 'table-row' : 'none';
+        });
+        
+        // 2. Handle visibility of section headers and totals
+        if (isConfidenceFilterActive) {
+            // When a color filter is active, hide all section-related rows
+            document.querySelectorAll('.section-header-row, .section-total-row').forEach(row => {
+                row.style.display = 'none';
+            });
+        } else {
+            // When no color filter is active (i.e., 'all' is selected),
+            // show/hide section rows based on the visibility of their topic rows (e.g., due to search)
+            Object.keys(sections).forEach(sectionName => {
+                 const headerRow = sections[sectionName].headerRow;
+                 // Don't touch collapsed sections
+                 if (headerRow.classList.contains('collapsed')) return;
+
+                 const topicRowsInSection = document.querySelectorAll(`tr[data-section="${sectionName}"]`);
+                 const isAnyTopicRowVisible = Array.from(topicRowsInSection).some(r => r.style.display !== 'none');
+                 
+                 const displayStyle = isAnyTopicRowVisible ? 'table-row' : 'none';
+                 headerRow.style.display = displayStyle;
+                 sections[sectionName].totalRow.style.display = displayStyle;
+            });
+        }
+    }
+
+
+    // --- Init & Event Listeners ---
+    function init() {
+        initializeCells();
+        setupEditorToolbar();
+        updateSectionHeaderCounts();
+
+        try {
+            const compressedState = localStorage.getItem('temarioProgresoV2_compressed');
+            const legacyState = localStorage.getItem('temarioProgresoV2');
+
+            if (compressedState && window.pako) {
+                const binaryString = atob(compressedState);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const decompressedString = window.pako.inflate(bytes, { to: 'string' });
+                loadState(JSON.parse(decompressedString));
+            } else if (legacyState) {
+                loadState(JSON.parse(legacyState));
+            } else {
+                updateAllTotals();
+            }
+        } catch (e) {
+            console.error("Error al cargar el estado:", e);
+            alert("Error al cargar el progreso guardado. Puede estar corrupto. Se recomienda limpiar los datos del sitio o importar un respaldo.");
+            localStorage.removeItem('temarioProgresoV2');
+            localStorage.removeItem('temarioProgresoV2_compressed');
+            updateAllTotals();
+        }
+
+
+        // Table event delegation
+        tableBody.addEventListener('click', handleTableClick);
+
+        // Search and Filter Listeners
+        searchBar.addEventListener('input', handleSearch);
+        confidenceFiltersContainer.addEventListener('click', e => {
+            const btn = e.target.closest('.filter-btn');
+            if (!btn) return;
+
+            confidenceFiltersContainer.querySelector('.active')?.classList.remove('active');
+            btn.classList.add('active');
+            activeConfidenceFilter = btn.dataset.filter;
+            filterTable();
+        });
+
+        // Link Modal
+        saveLinkBtn.addEventListener('click', () => {
+            if (activeLinkCell) {
+                const linkAnchor = activeLinkCell.querySelector('.link-anchor');
+                const newLink = linkInput.value.trim();
+                if (newLink) {
+                    linkAnchor.setAttribute('href', newLink);
+                    linkAnchor.style.display = 'inline-flex';
+                } else {
+                    linkAnchor.setAttribute('href', '#');
+                    linkAnchor.style.display = 'none';
+                }
+                saveState();
+            }
+            hideModal(linkModal);
+        });
+
+        cancelLinkBtn.addEventListener('click', () => hideModal(linkModal));
+        
+        linkInput.addEventListener('input', () => {
+            openLinkPreviewBtn.href = linkInput.value;
+            openLinkPreviewBtn.classList.toggle('hidden', !linkInput.value);
+        });
+
+        // Notes Modal
+        const closeNoteModal = () => {
+             if (!notesModal.classList.contains('visible')) return;
+            activeNoteIcon = null;
+            notesEditor.innerHTML = '';
+            notesModalTitle.textContent = '';
+            notesModal.classList.remove('readonly-mode');
+            toggleReadOnlyBtn.innerHTML = '👁️';
+            hideModal(notesModal);
+        };
+
+        const saveNoteContent = () => {
+             if (activeNoteIcon) {
+                const row = activeNoteIcon.closest('tr');
+                const noteType = activeNoteIcon.dataset.noteType;
+                const content = notesEditor.innerHTML;
+                row.dataset[`${noteType}Note`] = content;
+                row.dataset[`${noteType}LineHeight`] = notesEditor.style.lineHeight || '1.6';
+                row.dataset.noteTitle = notesModalTitle.textContent;
+                activeNoteIcon.classList.toggle('has-note', !!content.trim());
+                saveState();
+            }
+        };
+
+        saveNoteBtn.addEventListener('click', saveNoteContent);
+        saveAndCloseNoteBtn.addEventListener('click', () => {
+            saveNoteContent();
+            closeNoteModal();
+        });
+        
+        cancelNoteBtn.addEventListener('click', closeNoteModal);
+        
+        unmarkNoteBtn.addEventListener('click', () => {
+            if (confirm("¿Estás seguro de que quieres borrar el contenido de esta nota?")) {
+                notesEditor.innerHTML = '';
+            }
+        });
+        
+        copyNoteTextBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(notesEditor.innerText || notesEditor.textContent)
+                .then(() => alert("Texto copiado al portapapeles."))
+                .catch(err => console.error("Error al copiar texto:", err));
+        });
+
+        notesEditor.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                if (selectedImageForResize) {
+                    selectedImageForResize.classList.remove('selected-for-resize');
+                }
+                selectedImageForResize = e.target;
+                selectedImageForResize.classList.add('selected-for-resize');
+            } else {
+                 if (selectedImageForResize) {
+                    selectedImageForResize.classList.remove('selected-for-resize');
+                    selectedImageForResize = null;
+                }
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+             // Hide any open dropdowns if clicking outside
+            if (!e.target.closest('.symbol-dropdown') && !e.target.closest('.color-palette-group')) {
+                document.querySelectorAll('.symbol-dropdown-content.visible, .color-submenu.visible').forEach(d => {
+                    d.classList.remove('visible');
+                });
+            }
+        });
+        
+        // Readonly mode toggle
+        toggleReadOnlyBtn.addEventListener('click', () => {
+            const container = notesModal.querySelector('.modal-content');
+            container.classList.toggle('readonly-mode');
+            const isReadonly = container.classList.contains('readonly-mode');
+            notesEditor.contentEditable = !isReadonly;
+            toggleReadOnlyBtn.innerHTML = isReadonly ? '✏️' : '👁️';
+            toggleReadOnlyBtn.title = isReadonly ? 'Modo Edición' : 'Modo Solo Lectura';
+        });
+
+        // Main Import/Export
+        exportBtn.addEventListener('click', () => {
+            const stateString = JSON.stringify(getStateObject(), null, 2);
+            const blob = new Blob([stateString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'temario_progreso.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        importBtn.addEventListener('click', () => importFileInput.click());
+        importFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const state = JSON.parse(e.target.result);
+                        if (confirm("¿Estás seguro de que quieres importar este archivo? Se sobrescribirá tu progreso actual.")) {
+                           loadState(state);
+                        }
+                    } catch (err) {
+                        alert('Error al leer el archivo. Asegúrate de que es un archivo de exportación válido.');
+                        console.error("Error al parsear el archivo JSON importado:", err);
+                    }
+                };
+                reader.readAsText(file);
+                importFileInput.value = ''; // Reset for next import
+            }
+        });
+
+        // Note-specific Import/Export
+        exportNoteBtn.addEventListener('click', () => {
+            const content = notesEditor.innerHTML;
+            const title = notesModalTitle.textContent;
+            const blob = new Blob([`<h1>${title}</h1>\n${content}`], {type: 'text/html'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        importNoteBtn.addEventListener('click', () => importNoteFileInput.click());
+        importNoteFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (readEvent) => {
+                    if(confirm("¿Estás seguro? Esto reemplazará el contenido actual de la nota.")) {
+                        notesEditor.innerHTML = readEvent.target.result;
+                    }
+                };
+                reader.readAsText(file);
+                importNoteFileInput.value = '';
+            }
+        });
+        
+        // Settings Dropdown
+        settingsBtn.addEventListener('click', () => {
+            settingsDropdown.classList.toggle('hidden');
+        });
+        
+        document.addEventListener('click', e => {
+            if (!settingsBtn.contains(e.target) && !settingsDropdown.contains(e.target)) {
+                settingsDropdown.classList.add('hidden');
+            }
+        });
+
+        settingsDropdown.addEventListener('click', e => {
+            e.preventDefault();
+            const target = e.target;
+            if (target.classList.contains('theme-option')) {
+                applyTheme(target.dataset.theme);
+                settingsDropdown.classList.add('hidden');
+                saveState();
+            }
+            if (target.classList.contains('icon-style-option')) {
+                applyIconStyle(target.dataset.style);
+                settingsDropdown.classList.add('hidden');
+                saveState();
+            }
+        });
+
+        // AI Modal
+        askAiBtn.addEventListener('click', async () => {
+            aiResponseArea.innerHTML = "Escribe tu pregunta a continuación...";
+            aiQuestionInput.value = '';
+            showModal(aiQaModal);
+        });
+        
+        cancelAiQaBtn.addEventListener('click', () => hideModal(aiQaModal));
+        sendAiQaBtn.addEventListener('click', async () => {
+            const question = aiQuestionInput.value.trim();
+            if (!question) {
+                alert("Por favor, escribe una pregunta.");
+                return;
+            }
+            if (!API_KEY) {
+                alert("La clave de API de Google GenAI no está configurada.");
+                return;
+            }
+
+            aiQaLoader.classList.remove('hidden');
+            sendAiQaBtn.disabled = true;
+
+            try {
+                const ai = new GoogleGenAI({ apiKey: API_KEY });
+                
+                let context = "Contexto de las notas del usuario:\n\n";
+                document.querySelectorAll('tr[data-topic-id]').forEach(row => {
+                    const title = row.querySelector('.topic-text').textContent;
+                    const greyNote = row.dataset.greyNote;
+                    const blueNote = row.dataset.blueNote;
+                    if(greyNote || blueNote) {
+                        context += `--- TEMA: ${title} ---\n`;
+                        if (greyNote) context += `Esquema:\n${new DOMParser().parseFromString(greyNote, 'text/html').body.textContent}\n\n`;
+                        if (blueNote) context += `Desarrollo:\n${new DOMParser().parseFromString(blueNote, 'text/html').body.textContent}\n\n`;
+                    }
+                });
+
+                const fullPrompt = `${context}\n\n---\n\nPregunta del usuario: ${question}\n\nResponde a la pregunta basándote únicamente en el contexto proporcionado. Si la respuesta no está en el contexto, indícalo claramente.`;
+                
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash',
+                    contents: fullPrompt
+                });
+                
+                let responseText = response.text.replace(/\n/g, '<br>'); // Simple markdown to HTML
+                aiResponseArea.innerHTML = responseText;
+
+            } catch (error) {
+                console.error("Error con la API de GenAI:", error);
+                aiResponseArea.textContent = "Hubo un error al contactar a la IA. Por favor, revisa la consola para más detalles.";
+            } finally {
+                aiQaLoader.classList.add('hidden');
+                sendAiQaBtn.disabled = false;
+            }
+        });
+
+        // Global listener for closing popups on outside click
+        window.addEventListener('click', e => {
+            const overlay = e.target;
+            if (overlay.classList.contains('modal-overlay')) {
+                 if (overlay.id === 'notes-modal') {
+                    // Prevent closing notes modal by clicking overlay
+                    return;
+                }
+                hideModal(overlay);
+            }
+        });
+        
+        // Autosave on header edit
+        document.querySelectorAll('thead th[contenteditable="true"]').forEach(th => {
+            th.addEventListener('blur', saveState);
+        });
+        
+        document.querySelectorAll('.section-title').forEach(el => {
+            el.setAttribute('contenteditable', 'true');
+            el.addEventListener('blur', saveState);
+        });
+
+    } // end of init()
+
+    // --- Start Application ---
+    init();
 });

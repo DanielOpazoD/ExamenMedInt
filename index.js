@@ -80,6 +80,19 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     });
 
+    const aggregatedSummaryPath = 'data/integracion_resumen_final_numerado.html';
+    const sectionSummaryConfig = {
+        cardio: { path: 'data/1. cardiologia_summary_final.html', topicRange: [1, 17] },
+        neumo: { path: 'data/2. neumologia_summary_final.html', topicRange: [18, 28] },
+        nefro: { path: 'data/3. nefro_summary_final.html', topicRange: [29, 38] },
+        digestivo: { path: 'data/4. digestivo_summary_final.html', topicRange: [39, 50] },
+        metabolismo: { path: 'data/5. endocrino_summary_final.html', topicRange: [51, 59] },
+        hemato: { path: 'data/6. hemato_summary_final.html', topicRange: [60, 64] },
+        neuro: { path: 'data/7. neuro_summary_final.html', topicRange: [65, 70] },
+        reumato: { path: 'data/8. reumato_summary_final.html', topicRange: [71, 75] },
+        infecto: { path: 'data/9. infecto_summary_final.html', topicRange: [76, 84] }
+    };
+
     // --- Core Logic Functions ---
     
     function createLinkCellContent() {
@@ -494,6 +507,169 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+    }
+
+    function parseTopicNumber(identifier) {
+        if (!identifier && identifier !== 0) return null;
+        const match = String(identifier).match(/(\d{1,3})/);
+        if (!match) return null;
+        const number = parseInt(match[1], 10);
+        return Number.isNaN(number) ? null : number;
+    }
+
+    function extractTopicContentMap(doc) {
+        const topicMap = new Map();
+        const addToMap = (topicNumber, html) => {
+            if (!topicNumber || topicMap.has(topicNumber)) return;
+            const content = html ? html.trim() : '';
+            if (content) {
+                topicMap.set(topicNumber, content);
+            }
+        };
+
+        const selectors = [
+            '[data-topic-id]',
+            '[data-topic]',
+            '[data-tema]',
+            '[data-id]',
+            '[id^="topic-"]',
+            '[id^="tema-"]'
+        ];
+
+        const candidateElements = new Set();
+        selectors.forEach(selector => {
+            doc.querySelectorAll(selector).forEach(el => candidateElements.add(el));
+        });
+
+        candidateElements.forEach(el => {
+            const identifier = el.dataset.topicId || el.dataset.topic || el.dataset.tema || el.dataset.id || el.id || '';
+            const topicNumber = parseTopicNumber(identifier);
+            if (!topicNumber) return;
+            const inner = typeof el.innerHTML === 'string' ? el.innerHTML.trim() : '';
+            const content = inner || (typeof el.outerHTML === 'string' ? el.outerHTML.trim() : '');
+            addToMap(topicNumber, content);
+        });
+
+        if (topicMap.size === 0) {
+            const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+            const numberedHeadings = headings.filter(heading => parseTopicNumber(heading.textContent) !== null);
+
+            for (let i = 0; i < numberedHeadings.length; i++) {
+                const heading = numberedHeadings[i];
+                const topicNumber = parseTopicNumber(heading.textContent);
+                if (!topicNumber) continue;
+
+                const container = doc.createElement('div');
+                let current = heading;
+                const limit = numberedHeadings[i + 1];
+
+                while (current && current !== limit) {
+                    container.appendChild(current.cloneNode(true));
+                    current = current.nextSibling;
+                }
+
+                addToMap(topicNumber, container.innerHTML);
+            }
+        }
+
+        return topicMap;
+    }
+
+    function applyTopicSummaries(topicMap, topicRange) {
+        topicMap.forEach((content, topicNumber) => {
+            if (!content) return;
+            if (Array.isArray(topicRange)) {
+                const [min, max] = topicRange;
+                if (topicNumber < min || topicNumber > max) return;
+            }
+
+            const row = document.querySelector(`tr[data-topic-id="topic-${topicNumber}"]`);
+            if (!row || row.dataset.blueNote) return;
+
+            row.dataset.blueNote = content;
+            if (!row.dataset.blueLineHeight) {
+                row.dataset.blueLineHeight = '1.6';
+            }
+
+            const noteIcon = row.querySelector('.note-icon[data-note-type="blue"]');
+            if (noteIcon) {
+                noteIcon.classList.add('has-note');
+            }
+        });
+    }
+
+    async function loadSummaryFile(path, options = {}) {
+        const { sectionId, topicRange, assignTopics = true } = options;
+
+        if (typeof fetch !== 'function') {
+            console.warn('Fetch API no disponible; se omite la carga del resumen:', path);
+            return false;
+        }
+
+        const encodedPath = encodeURI(path);
+
+        try {
+            const response = await fetch(encodedPath, { cache: 'no-cache' });
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const htmlText = await response.text();
+            if (!htmlText.trim()) return false;
+
+            let doc = null;
+            if (typeof DOMParser !== 'undefined') {
+                const parser = new DOMParser();
+                doc = parser.parseFromString(htmlText, 'text/html');
+            }
+
+            if (assignTopics && doc) {
+                const topicMap = extractTopicContentMap(doc);
+                if (topicMap.size > 0) {
+                    applyTopicSummaries(topicMap, topicRange);
+                }
+            }
+
+            if (sectionId) {
+                const headerRow = sections[sectionId]?.headerRow;
+                if (headerRow && !headerRow.dataset.sectionNote) {
+                    const sectionContent = doc && doc.body ? doc.body.innerHTML.trim() : htmlText.trim();
+                    if (sectionContent) {
+                        headerRow.dataset.sectionNote = sectionContent;
+                        if (!headerRow.dataset.sectionLineHeight) {
+                            headerRow.dataset.sectionLineHeight = '1.6';
+                        }
+                        const icon = headerRow.querySelector('.section-note-icon');
+                        if (icon) {
+                            icon.classList.add('has-note');
+                        }
+                    }
+                }
+            }
+
+            return true;
+        } catch (error) {
+            console.warn(`No se pudo cargar el resumen desde "${path}":`, error);
+            return false;
+        }
+    }
+
+    async function loadDefaultSectionSummaries() {
+        try {
+            await loadSummaryFile(aggregatedSummaryPath, { topicRange: [1, 84], assignTopics: true });
+        } catch (error) {
+            console.warn('Error al cargar el resumen general numerado:', error);
+        }
+
+        const loaders = Object.entries(sectionSummaryConfig).map(([sectionId, config]) =>
+            loadSummaryFile(config.path, {
+                sectionId,
+                topicRange: config.topicRange,
+                assignTopics: true
+            })
+        );
+
+        await Promise.allSettled(loaders);
     }
 
     // --- State Management ---
@@ -960,6 +1136,10 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.removeItem('temarioProgresoV2_compressed');
             updateAllTotals();
         }
+
+        loadDefaultSectionSummaries().catch(error => {
+            console.warn('Error al aplicar los resúmenes predeterminados:', error);
+        });
 
 
         // Table event delegation
